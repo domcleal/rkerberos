@@ -485,8 +485,8 @@ void Init_rkerberos(){
   rb_define_alias(cKrb5, "default_realm", "get_default_realm");
   rb_define_alias(cKrb5, "default_principal", "get_default_principal");
 
-  /* 0.9.0: The version of the custom krb5_auth library */
-  rb_define_const(cKrb5, "VERSION", rb_str_new2("0.9.0"));
+  /* 0.1.0: The version of the custom rkerberos library */
+  rb_define_const(cKrb5, "VERSION", rb_str_new2("0.1.0"));
 
   // Encoding type constants
 

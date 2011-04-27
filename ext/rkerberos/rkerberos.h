@@ -19,7 +19,7 @@ void Init_keytab();
 void Init_keytab_entry();
 void Init_ccache();
 
-// Defined in krb5_auth.c
+// Defined in rkerberos.c
 VALUE rb_hash_aref2(VALUE, char*);
 
 // Variable declarations

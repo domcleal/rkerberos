@@ -32,7 +32,7 @@ class TC_Krb5 < Test::Unit::TestCase
   end
 
   test "version constant" do
-    assert_equal('0.9.0', Kerberos::Krb5::VERSION)
+    assert_equal('0.1.0', Kerberos::Krb5::VERSION)
   end
 
   test "constructor accepts a block and yields itself" do
