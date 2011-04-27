@@ -1,24 +1,24 @@
 ########################################################################
 # test_principal.rb
 #
-# Test suite for the Krb5Auth::Krb5::Principal class.
+# Test suite for the Kerberos::Krb5::Principal class.
 ########################################################################
 require 'rubygems'
 gem 'test-unit'
 
 require 'open3'
 require 'test/unit'
-require 'krb5_auth'
+require 'rkerberos'
 
 class TC_Krb5_Principal < Test::Unit::TestCase
   def setup
     @name  = 'Jon'
-    @princ = Krb5Auth::Krb5::Principal.new(@name)
+    @princ = Kerberos::Krb5::Principal.new(@name)
   end
 
   test "argument to constructor must be a string" do
-    assert_raise(TypeError){ Krb5Auth::Krb5::Principal.new(1) }
-    assert_raise(TypeError){ Krb5Auth::Krb5::Principal.new(true) }
+    assert_raise(TypeError){ Kerberos::Krb5::Principal.new(1) }
+    assert_raise(TypeError){ Kerberos::Krb5::Principal.new(true) }
   end
 
   test "name basic functionality" do
@@ -96,11 +96,11 @@ class TC_Krb5_Principal < Test::Unit::TestCase
   end
 
   test "constructor accepts a name" do
-    assert_nothing_raised{ Krb5Auth::Krb5::Principal.new('delete_me') }
+    assert_nothing_raised{ Kerberos::Krb5::Principal.new('delete_me') }
   end
 
   test "passing a name to the constructor sets the instance variable" do
-    assert_nothing_raised{ @princ = Krb5Auth::Krb5::Principal.new('delete_me') }
+    assert_nothing_raised{ @princ = Kerberos::Krb5::Principal.new('delete_me') }
     assert_equal('delete_me', @princ.name)
   end
 
@@ -125,7 +125,7 @@ class TC_Krb5_Principal < Test::Unit::TestCase
 
   test "equality works as expected" do
     assert_true(@princ == @princ)
-    assert_false(@princ == Krb5Auth::Krb5::Principal.new('other'))
+    assert_false(@princ == Kerberos::Krb5::Principal.new('other'))
   end
 
   def teardown

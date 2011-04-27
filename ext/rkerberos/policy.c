@@ -2,7 +2,7 @@
 
 VALUE cKadm5Policy;
 
-// Free function for the Krb5Auth::Krb5::CCache class.
+// Free function for the Kerberos::Krb5::CCache class.
 static void rkadm5_policy_free(RUBY_KADM5_POLICY* ptr){
   if(!ptr)
     return;
@@ -13,7 +13,7 @@ static void rkadm5_policy_free(RUBY_KADM5_POLICY* ptr){
   free(ptr);
 }
 
-// Allocation function for the Krb5Auth::Kadm5::Policy class.
+// Allocation function for the Kerberos::Kadm5::Policy class.
 static VALUE rkadm5_policy_allocate(VALUE klass){
   RUBY_KADM5_POLICY* ptr = malloc(sizeof(RUBY_KADM5_POLICY));
   memset(ptr, 0, sizeof(RUBY_KADM5_POLICY));
@@ -22,7 +22,7 @@ static VALUE rkadm5_policy_allocate(VALUE klass){
 
 /*
  * call-seq:
- *   Krb5Auth::Kadm5::Policy.new(options)
+ *   Kerberos::Kadm5::Policy.new(options)
  *
  * Returns a new policy object using +options+ you choose to pass, where
  * the +options+ argument is a hash. This does NOT actually create the policy
@@ -155,7 +155,7 @@ static VALUE rkadm5_policy_inspect(VALUE self){
 }
 
 void Init_policy(){
-  /* The Krb5Auth::Kadm5::Policy class encapsulates a Kerberos policy. */
+  /* The Kerberos::Kadm5::Policy class encapsulates a Kerberos policy. */
   cKadm5Policy = rb_define_class_under(cKadm5, "Policy", rb_cObject);
 
   // Allocation Function

@@ -1,18 +1,18 @@
 ########################################################################
 # test_context.rb
 #
-# Test suite for the Krb5Auth::Krb5::Context class.
+# Test suite for the Kerberos::Krb5::Context class.
 ########################################################################
 require 'rubygems'
 gem 'test-unit'
 
 require 'open3'
 require 'test/unit'
-require 'krb5_auth'
+require 'rkerberos'
 
 class TC_Krb5_Context < Test::Unit::TestCase
   def setup
-    @context = Krb5Auth::Krb5::Context.new
+    @context = Kerberos::Krb5::Context.new
   end
 
   test "close basic functionality" do

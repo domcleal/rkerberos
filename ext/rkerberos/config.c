@@ -14,7 +14,7 @@ static void rkadm5_config_free(RUBY_KADM5_CONFIG* ptr){
   free(ptr);
 }
 
-// Allocation function for the Krb5Auth::Krb5 class.
+// Allocation function for the Kerberos::Krb5 class.
 static VALUE rkadm5_config_allocate(VALUE klass){
   RUBY_KADM5_CONFIG* ptr = malloc(sizeof(RUBY_KADM5_CONFIG));
   memset(ptr, 0, sizeof(RUBY_KADM5_CONFIG));
@@ -22,7 +22,7 @@ static VALUE rkadm5_config_allocate(VALUE klass){
 }
 
 /*
- * Returns a Krb5Auth::Kadm5::Config object. This object contains Kerberos
+ * Returns a Kerberos::Kadm5::Config object. This object contains Kerberos
  * admin configuration.
  *
  * Note that the returned object is frozen. Changes made to the Kerberos

@@ -1,17 +1,17 @@
 #######################################################################
 # test_keytab_entry.rb
 #
-# Test suite for the Krb5Auth::Krb5::KeytabEntry class.
+# Test suite for the Kerberos::Krb5::KeytabEntry class.
 #######################################################################
 require 'rubygems'
 gem 'test-unit'
 
 require 'test/unit'
-require 'krb5_auth'
+require 'rkerberos'
 
 class TC_Krb5_KeytabEntry < Test::Unit::TestCase
   def setup
-    @kte = Krb5Auth::Krb5::Keytab::Entry.new
+    @kte = Kerberos::Krb5::Keytab::Entry.new
   end
 
   test "principal getter basic functionality" do

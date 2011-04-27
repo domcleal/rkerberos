@@ -7,7 +7,7 @@ VALUE cKadm5PrincipalNotFoundException;
 // Prototype
 static VALUE rkadm5_close(VALUE);
 
-// Free function for the Krb5Auth::Kadm5 class.
+// Free function for the Kerberos::Kadm5 class.
 static void rkadm5_free(RUBY_KADM5* ptr){
   if(!ptr)
     return;
@@ -21,7 +21,7 @@ static void rkadm5_free(RUBY_KADM5* ptr){
   free(ptr);
 }
 
-// Allocation function for the Krb5Auth::Kadm5 class.
+// Allocation function for the Kerberos::Kadm5 class.
 static VALUE rkadm5_allocate(VALUE klass){
   RUBY_KADM5* ptr = malloc(sizeof(RUBY_KADM5));
   memset(ptr, 0, sizeof(RUBY_KADM5));
@@ -30,11 +30,11 @@ static VALUE rkadm5_allocate(VALUE klass){
 
 /*
  * call-seq:
- *   Krb5Auth::Kadm5.new(:principal => 'name', :password => 'xxxxx')
- *   Krb5Auth::Kadm5.new(:principal => 'name', :keytab => '/path/to/your/keytab')
- *   Krb5Auth::Kadm5.new(:principal => 'name', :keytab => true)
+ *   Kerberos::Kadm5.new(:principal => 'name', :password => 'xxxxx')
+ *   Kerberos::Kadm5.new(:principal => 'name', :keytab => '/path/to/your/keytab')
+ *   Kerberos::Kadm5.new(:principal => 'name', :keytab => true)
  *
- * Creates and returns a new Krb5Auth::Kadm5 object. A hash argument is
+ * Creates and returns a new Kerberos::Kadm5 object. A hash argument is
  * accepted that allows you to specify a principal and a password, or
  * a keytab file.
  *
@@ -492,7 +492,7 @@ static VALUE rkadm5_get_principal(VALUE self, VALUE v_user){
  * Example:
  *
  *   # Using a Policy object
- *   policy = Krb5Auth::Kadm5::Policy.new(:name => 'test', :min_length => 5)
+ *   policy = Kerberos::Kadm5::Policy.new(:name => 'test', :min_length => 5)
  *   kadm5.create_policy(policy)
  *
  *   # Using a hash
@@ -698,7 +698,7 @@ static VALUE rkadm5_find_policy(VALUE self, VALUE v_name){
  *
  * Example:
  *
- *   policy = Krb5Auth::Kadm5::Policy.find('test')
+ *   policy = Kerberos::Kadm5::Policy.find('test')
  *   policy.max_length = 1024
  *   kadm5.modify_policy(policy)
  */

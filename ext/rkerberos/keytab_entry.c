@@ -2,7 +2,7 @@
 
 VALUE cKrb5KtEntry;
 
-// Free function for the Krb5Auth::Krb5::Keytab::Entry class.
+// Free function for the Kerberos::Krb5::Keytab::Entry class.
 static void rkrb5_kt_entry_free(RUBY_KRB5_KT_ENTRY* ptr){
   if(!ptr)
     return;
@@ -10,7 +10,7 @@ static void rkrb5_kt_entry_free(RUBY_KRB5_KT_ENTRY* ptr){
   free(ptr);
 }
 
-// Allocation function for the Krb5Auth::Krb5::Keytab::Entry class.
+// Allocation function for the Kerberos::Krb5::Keytab::Entry class.
 static VALUE rkrb5_kt_entry_allocate(VALUE klass){
   RUBY_KRB5_KT_ENTRY* ptr = malloc(sizeof(RUBY_KRB5_KT_ENTRY));
   memset(ptr, 0, sizeof(RUBY_KRB5_KT_ENTRY));
@@ -20,9 +20,9 @@ static VALUE rkrb5_kt_entry_allocate(VALUE klass){
 /*
  * call-seq:
  *
- *   Krb5Auth::Krb5::Keytab::Entry.new
+ *   Kerberos::Krb5::Keytab::Entry.new
  *
- * Creates and returns a new Krb5Auth::Krb5::Keytab::Entry object. These
+ * Creates and returns a new Kerberos::Krb5::Keytab::Entry object. These
  * objects are what is typically returned from the various Krb5::Keytab
  * methods.
  */
@@ -64,7 +64,7 @@ static VALUE rkrb5_kt_entry_inspect(VALUE self){
 }
 
 void Init_keytab_entry(){
-  // The Krb5Auth::Krb5::Keytab::Entry class encapsulates a Kerberos keytab entry.
+  // The Kerberos::Krb5::Keytab::Entry class encapsulates a Kerberos keytab entry.
   cKrb5KtEntry = rb_define_class_under(cKrb5Keytab, "Entry", rb_cObject);
 
   // Allocation function

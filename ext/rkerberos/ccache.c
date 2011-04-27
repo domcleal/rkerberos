@@ -2,7 +2,7 @@
 
 VALUE cKrb5CCache;
 
-// Free function for the Krb5Auth::Krb5::CCache class.
+// Free function for the Kerberos::Krb5::CCache class.
 static void rkrb5_ccache_free(RUBY_KRB5_CCACHE* ptr){
   if(!ptr)
     return;
@@ -19,7 +19,7 @@ static void rkrb5_ccache_free(RUBY_KRB5_CCACHE* ptr){
   free(ptr);
 }
 
-// Allocation function for the Krb5Auth::Krb5::CCache class.
+// Allocation function for the Kerberos::Krb5::CCache class.
 static VALUE rkrb5_ccache_allocate(VALUE klass){
   RUBY_KRB5_CCACHE* ptr = malloc(sizeof(RUBY_KRB5_CCACHE));
   memset(ptr, 0, sizeof(RUBY_KRB5_CCACHE));
@@ -28,9 +28,9 @@ static VALUE rkrb5_ccache_allocate(VALUE klass){
 
 /*
  * call-seq:
- *   Krb5Auth::CredentialsCache.new(principal = nil, cache_name = nil)
+ *   Kerberos::CredentialsCache.new(principal = nil, cache_name = nil)
  *
- * Creates and returns a new Krb5Auth::CredentialsCache object. If cache_name
+ * Creates and returns a new Kerberos::CredentialsCache object. If cache_name
  * is specified, then that cache is used, which must be in "type:residual"
  * format, where 'type' is a type known to Kerberos (typically 'FILE').
  *
@@ -230,7 +230,7 @@ static VALUE rkrb5_ccache_destroy(VALUE self){
 }
 
 void Init_ccache(){
-  /* The Krb5Auth::Krb5::CredentialsCache class encapsulates a Kerberos credentials cache. */
+  /* The Kerberos::Krb5::CredentialsCache class encapsulates a Kerberos credentials cache. */
   cKrb5CCache = rb_define_class_under(cKrb5, "CredentialsCache", rb_cObject);
 
   // Allocation Function

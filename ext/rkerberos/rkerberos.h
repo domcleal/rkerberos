@@ -36,7 +36,7 @@ extern VALUE cKadm5Config;
 extern VALUE cKadm5Exception;
 extern VALUE cKadm5Policy;
 
-// Krb5Auth::Krb5
+// Kerberos::Krb5
 typedef struct {
   krb5_context ctx;
   krb5_creds creds;
@@ -44,20 +44,20 @@ typedef struct {
   krb5_keytab keytab;
 } RUBY_KRB5;
 
-// Krb5Auth::Context
+// Kerberos::Context
 typedef struct {
   krb5_context ctx;
   krb5_enctype etypes;
 } RUBY_KRB5_CONTEXT;
 
-// Krb5Auth::Kadm5
+// Kerberos::Kadm5
 typedef struct {
   krb5_context ctx;
   krb5_principal princ;
   void* handle;
 } RUBY_KADM5;
 
-// Krb5Auth::Krb5::Keytab::Entry
+// Kerberos::Krb5::Keytab::Entry
 typedef struct {
   krb5_principal principal;
   krb5_timestamp timestamp;
@@ -65,7 +65,7 @@ typedef struct {
   krb5_keyblock key;
 } RUBY_KRB5_KT_ENTRY;
 
-// Krb5Auth::Krb5::Keytab
+// Kerberos::Krb5::Keytab
 typedef struct {
   krb5_context ctx;
   krb5_creds creds;

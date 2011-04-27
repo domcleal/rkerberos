@@ -1,17 +1,17 @@
 ########################################################################
 # test_config.rb
 #
-# Test suite for the Krb5Auth::Kadm5::Config class.
+# Test suite for the Kerberos::Kadm5::Config class.
 ########################################################################
 require 'rubygems'
 gem 'test-unit'
 
 require 'test/unit'
-require 'krb5_auth'
+require 'rkerberos'
 
 class TC_Kadm5_Config < Test::Unit::TestCase
   def setup
-    @config = Krb5Auth::Kadm5::Config.new
+    @config = Kerberos::Kadm5::Config.new
   end
 
   test "config object is frozen" do

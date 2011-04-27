@@ -1,17 +1,17 @@
 ########################################################################
 # test_policy.rb
 #
-# Tests for the Krb5Auth::Kadm5::Policy class.
+# Tests for the Kerberos::Kadm5::Policy class.
 ########################################################################
 require 'rubygems'
 gem 'test-unit'
 
 require 'test/unit'
-require 'krb5_auth'
+require 'rkerberos'
 
 class TC_Kadm5_Policy < Test::Unit::TestCase
   def setup
-    @policy = Krb5Auth::Kadm5::Policy.new(:name => 'test', :max_life => 10000)
+    @policy = Kerberos::Kadm5::Policy.new(:name => 'test', :max_life => 10000)
   end
 
   test 'policy name basic functionality' do
@@ -24,11 +24,11 @@ class TC_Kadm5_Policy < Test::Unit::TestCase
   end
 
   test 'policy name must be a string' do
-    assert_raise(TypeError){ Krb5Auth::Kadm5::Policy.new(:name => 1) }
+    assert_raise(TypeError){ Kerberos::Kadm5::Policy.new(:name => 1) }
   end
 
   test 'policy name must be present' do
-    assert_raise(ArgumentError){ Krb5Auth::Kadm5::Policy.new(:max_life => 10000) }
+    assert_raise(ArgumentError){ Kerberos::Kadm5::Policy.new(:max_life => 10000) }
   end
 
   test 'min_life basic functionality' do
@@ -38,7 +38,7 @@ class TC_Kadm5_Policy < Test::Unit::TestCase
 
   test 'min_life must be a number if not nil' do
     assert_raise(TypeError){
-      Krb5Auth::Kadm5::Policy.new(:name => 'test', :min_life => 'test')
+      Kerberos::Kadm5::Policy.new(:name => 'test', :min_life => 'test')
     }
   end
 
@@ -49,7 +49,7 @@ class TC_Kadm5_Policy < Test::Unit::TestCase
 
   test 'max_life must be a number if not nil' do
     assert_raise(TypeError){
-      Krb5Auth::Kadm5::Policy.new(:name => 'test', :max_life => 'test')
+      Kerberos::Kadm5::Policy.new(:name => 'test', :max_life => 'test')
     }
   end
 
@@ -60,7 +60,7 @@ class TC_Kadm5_Policy < Test::Unit::TestCase
 
   test 'min_length must be a number if not nil' do
     assert_raise(TypeError){
-      Krb5Auth::Kadm5::Policy.new(:name => 'test', :min_length => 'test')
+      Kerberos::Kadm5::Policy.new(:name => 'test', :min_length => 'test')
     }
   end
 
@@ -71,7 +71,7 @@ class TC_Kadm5_Policy < Test::Unit::TestCase
 
   test 'min_classes must be a number if not nil' do
     assert_raise(TypeError){
-      Krb5Auth::Kadm5::Policy.new(:name => 'test', :min_classes => 'test')
+      Kerberos::Kadm5::Policy.new(:name => 'test', :min_classes => 'test')
     }
   end
 
@@ -82,12 +82,12 @@ class TC_Kadm5_Policy < Test::Unit::TestCase
 
   test 'history_num must be a number if not nil' do
     assert_raise(TypeError){
-      Krb5Auth::Kadm5::Policy.new(:name => 'test', :history_num => 'test')
+      Kerberos::Kadm5::Policy.new(:name => 'test', :history_num => 'test')
     }
   end
 
   test 'instance variables are set as expected from the constructor' do
-    @policy = Krb5Auth::Kadm5::Policy.new(
+    @policy = Kerberos::Kadm5::Policy.new(
       :name        => 'test',
       :min_life    => 8888,
       :max_life    => 9999,
@@ -105,16 +105,16 @@ class TC_Kadm5_Policy < Test::Unit::TestCase
   end
 
   test 'constructor requires one argument' do
-    assert_raise(ArgumentError){ Krb5Auth::Kadm5::Policy.new }
-    assert_raise(ArgumentError){ Krb5Auth::Kadm5::Policy.new('foo', 'bar') }
+    assert_raise(ArgumentError){ Kerberos::Kadm5::Policy.new }
+    assert_raise(ArgumentError){ Kerberos::Kadm5::Policy.new('foo', 'bar') }
   end
 
   test 'constructor requires a hash argument' do
-    assert_raise(TypeError){ Krb5Auth::Kadm5::Policy.new('test') }
+    assert_raise(TypeError){ Kerberos::Kadm5::Policy.new('test') }
   end
 
   test 'constructor raises an error if the hash is empty' do
-    assert_raise(ArgumentError){ Krb5Auth::Kadm5::Policy.new({}) }
+    assert_raise(ArgumentError){ Kerberos::Kadm5::Policy.new({}) }
   end
 
   def teardown

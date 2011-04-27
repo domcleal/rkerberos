@@ -2,7 +2,7 @@
 
 VALUE cKrb5Context;
 
-// Free function for the Krb5Auth::Krb5::Context class.
+// Free function for the Kerberos::Krb5::Context class.
 static void rkrb5_context_free(RUBY_KRB5_CONTEXT* ptr){
   if(!ptr)
     return;
@@ -13,7 +13,7 @@ static void rkrb5_context_free(RUBY_KRB5_CONTEXT* ptr){
   free(ptr);
 }
 
-// Allocation function for the Krb5Auth::Krb5::Context class.
+// Allocation function for the Kerberos::Krb5::Context class.
 static VALUE rkrb5_context_allocate(VALUE klass){
   RUBY_KRB5_CONTEXT* ptr = malloc(sizeof(RUBY_KRB5_CONTEXT));
   memset(ptr, 0, sizeof(RUBY_KRB5_CONTEXT));
@@ -41,9 +41,9 @@ static VALUE rkrb5_context_close(VALUE self){
 
 /*
  * call-seq:
- *   Krb5Auth::Context.new
+ *   Kerberos::Context.new
  *
- * Creates and returns a new Krb5Auth::Context object.
+ * Creates and returns a new Kerberos::Context object.
  *
  * This class is not typically instantiated directly, but is used internally
  * by the krb5-auth library.
@@ -63,7 +63,7 @@ static VALUE rkrb5_context_initialize(VALUE self){
 }
 
 void Init_context(){
-  /* The Krb5Auth::Krb5::Context class encapsulates a Kerberos context. */
+  /* The Kerberos::Krb5::Context class encapsulates a Kerberos context. */
   cKrb5Context = rb_define_class_under(cKrb5, "Context", rb_cObject);
 
   // Allocation Function

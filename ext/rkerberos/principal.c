@@ -2,7 +2,7 @@
 
 VALUE cKrb5Principal;
 
-// Free function for the Krb5Auth::Krb5::Keytab class.
+// Free function for the Kerberos::Krb5::Keytab class.
 static void rkrb5_princ_free(RUBY_KRB5_PRINC* ptr){
   if(!ptr)
     return;
@@ -16,7 +16,7 @@ static void rkrb5_princ_free(RUBY_KRB5_PRINC* ptr){
   free(ptr);
 }
 
-// Allocation function for the Krb5Auth::Krb5::Keytab class.
+// Allocation function for the Kerberos::Krb5::Keytab class.
 static VALUE rkrb5_princ_allocate(VALUE klass){
   RUBY_KRB5_PRINC* ptr = malloc(sizeof(RUBY_KRB5_PRINC));
   memset(ptr, 0, sizeof(RUBY_KRB5_PRINC));
@@ -25,16 +25,16 @@ static VALUE rkrb5_princ_allocate(VALUE klass){
 
 /*
  * call-seq:
- *   Krb5Auth::Krb5::Principal.new(name)
+ *   Kerberos::Krb5::Principal.new(name)
  *
  * Creates and returns a new Krb5::Principal object. If a block is provided
  * then it yields itself.
  *
  * Example:
  *
- *   principal1 = Krb5Auth::Krb5::Principal.new('Jon')
+ *   principal1 = Kerberos::Krb5::Principal.new('Jon')
  *
- *   principal2 = Krb5Auth::Krb5::Principal.new('Jon') do |pr|
+ *   principal2 = Kerberos::Krb5::Principal.new('Jon') do |pr|
  *     pr.expire_time = Time.now + 20000
  *   end
  */
@@ -221,7 +221,7 @@ static VALUE rkrb5_princ_inspect(VALUE self){
 }
 
 void Init_principal(){
-  /* The Krb5Auth::Krb5::Principal class encapsulates a Kerberos principal. */
+  /* The Kerberos::Krb5::Principal class encapsulates a Kerberos principal. */
   cKrb5Principal = rb_define_class_under(cKrb5, "Principal", rb_cObject);
 
   // Allocation Function

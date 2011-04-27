@@ -19,7 +19,7 @@ VALUE rb_hash_aref2(VALUE v_hash, char* key){
   return v_val;
 }
 
-// Free function for the Krb5Auth::Krb5 class.
+// Free function for the Kerberos::Krb5 class.
 static void rkrb5_free(RUBY_KRB5* ptr){
   if(!ptr)
     return;
@@ -39,7 +39,7 @@ static void rkrb5_free(RUBY_KRB5* ptr){
   free(ptr);
 }
 
-// Allocation function for the Krb5Auth::Krb5 class.
+// Allocation function for the Kerberos::Krb5 class.
 static VALUE rkrb5_allocate(VALUE klass){
   RUBY_KRB5* ptr = malloc(sizeof(RUBY_KRB5));
   memset(ptr, 0, sizeof(RUBY_KRB5));
@@ -48,9 +48,9 @@ static VALUE rkrb5_allocate(VALUE klass){
 
 /*
  * call-seq:
- *   Krb5Auth::Krb5.new
+ *   Kerberos::Krb5.new
  *
- * Creates and returns a new Krb5Auth::Krb5 object. This initializes the
+ * Creates and returns a new Kerberos::Krb5 object. This initializes the
  * context for future method calls on that object.
  */
 static VALUE rkrb5_initialize(VALUE self){
@@ -461,7 +461,7 @@ static VALUE rkrb5_get_permitted_enctypes(VALUE self){
 }
 
 void Init_rkerberos(){
-  mKerberos      = rb_define_module("Krb5Auth");
+  mKerberos      = rb_define_module("Kerberos");
   cKrb5          = rb_define_class_under(mKerberos, "Krb5", rb_cObject);
   cKrb5Exception = rb_define_class_under(cKrb5, "Exception", rb_eStandardError);
 

@@ -1,7 +1,7 @@
 ########################################################################
 # test_krb5.rb
 #
-# Test suite for the Krb5Auth::Krb5 class. At the moment, this suite
+# Test suite for the Kerberos::Krb5 class. At the moment, this suite
 # requires that you export "testuser1" to a local keytab file called
 # "test.keytab" in the "test" directory for certain tests to pass.
 ########################################################################
@@ -10,7 +10,7 @@ gem 'test-unit'
 
 require 'open3'
 require 'test/unit'
-require 'krb5_auth'
+require 'rkerberos'
 
 class TC_Krb5 < Test::Unit::TestCase
   def self.startup
@@ -25,19 +25,19 @@ class TC_Krb5 < Test::Unit::TestCase
   end
 
   def setup
-    @krb5    = Krb5Auth::Krb5.new
-    @keytab  = Krb5Auth::Krb5::Keytab.new.default_name.split(':').last
+    @krb5    = Kerberos::Krb5.new
+    @keytab  = Kerberos::Krb5::Keytab.new.default_name.split(':').last
     @user    = "testuser1@" + @@realm
     @service = "kadmin/admin"
   end
 
   test "version constant" do
-    assert_equal('0.9.0', Krb5Auth::Krb5::VERSION)
+    assert_equal('0.9.0', Kerberos::Krb5::VERSION)
   end
 
   test "constructor accepts a block and yields itself" do
-    assert_nothing_raised{ Krb5Auth::Krb5.new{} }
-    Krb5Auth::Krb5.new{ |krb5| assert_kind_of(Krb5Auth::Krb5, krb5) }
+    assert_nothing_raised{ Kerberos::Krb5.new{} }
+    Kerberos::Krb5.new{ |krb5| assert_kind_of(Kerberos::Krb5, krb5) }
   end
 
   test "get_default_realm basic functionality" do
@@ -96,7 +96,7 @@ class TC_Krb5 < Test::Unit::TestCase
 
   test "calling get_init_creds_password after closing the object raises an error" do
     @krb5.close
-    assert_raise(Krb5Auth::Krb5::Exception){ @krb5.get_init_creds_password('foo', 'xxx') }
+    assert_raise(Kerberos::Krb5::Exception){ @krb5.get_init_creds_password('foo', 'xxx') }
   end
 
   test "calling get_init_creds_password after closing the object raises a specific error message" do
@@ -137,7 +137,7 @@ class TC_Krb5 < Test::Unit::TestCase
 
   test "calling get_init_creds_keytab after closing the object raises an error" do
     @krb5.close
-    assert_raise(Krb5Auth::Krb5::Exception){ @krb5.get_init_creds_keytab(@user, @keytab) }
+    assert_raise(Kerberos::Krb5::Exception){ @krb5.get_init_creds_keytab(@user, @keytab) }
   end
 
   test "change_password basic functionality" do
@@ -155,7 +155,7 @@ class TC_Krb5 < Test::Unit::TestCase
   end
 
   test "change_password fails if there is no context or principal" do
-    assert_raise(Krb5Auth::Krb5::Exception){ @krb5.change_password("XXX", "YYY") }
+    assert_raise(Kerberos::Krb5::Exception){ @krb5.change_password("XXX", "YYY") }
     assert_raise_message('no principal has been established'){ @krb5.change_password("XXX", "YYY") }
   end
 
@@ -171,7 +171,7 @@ class TC_Krb5 < Test::Unit::TestCase
 
   test "get_default_principal raises an error if no cache is found" do
     omit_if(@@cache_found, "Credential cache found, skipping")
-    assert_raise(Krb5Auth::Krb5::Exception){ @krb5.get_default_principal }
+    assert_raise(Kerberos::Krb5::Exception){ @krb5.get_default_principal }
   end
 
   test "get_permitted_enctypes basic functionality" do

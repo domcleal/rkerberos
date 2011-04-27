@@ -2,7 +2,7 @@
 
 VALUE cKrb5Keytab, cKrb5KeytabException;
 
-// Free function for the Krb5Auth::Krb5::Keytab class.
+// Free function for the Kerberos::Krb5::Keytab class.
 static void rkrb5_keytab_free(RUBY_KRB5_KEYTAB* ptr){
   if(!ptr)
     return;
@@ -16,7 +16,7 @@ static void rkrb5_keytab_free(RUBY_KRB5_KEYTAB* ptr){
   free(ptr);
 }
 
-// Allocation function for the Krb5Auth::Krb5::Keytab class.
+// Allocation function for the Kerberos::Krb5::Keytab class.
 static VALUE rkrb5_keytab_allocate(VALUE klass){
   RUBY_KRB5_KEYTAB* ptr = malloc(sizeof(RUBY_KRB5_KEYTAB));
   memset(ptr, 0, sizeof(RUBY_KRB5_KEYTAB));
@@ -234,7 +234,7 @@ static VALUE rkrb5_keytab_add_entry(int argc, VALUE* argv, VALUE self){
  * +vno+ is zero (the default), then the first entry that matches +principal+
  * is returned.
  *
- * Returns a Krb5Auth::Krb5::KeytabEntry object if the entry is found.
+ * Returns a Kerberos::Krb5::KeytabEntry object if the entry is found.
  *
  * Raises an exception if no entry is found.
  */
@@ -290,9 +290,9 @@ static VALUE rkrb5_keytab_get_entry(int argc, VALUE* argv, VALUE self){
 
 /*
  * call-seq:
- *   Krb5Auth::Krb5::Keytab.new(name = nil)
+ *   Kerberos::Krb5::Keytab.new(name = nil)
  *
- * Creates and returns a new Krb5Auth::Krb5::Keytab object. This initializes
+ * Creates and returns a new Kerberos::Krb5::Keytab object. This initializes
  * the context and keytab for future method calls on that object.
  *
  * A keytab file +name+ may be provided. If not, the system's default keytab
@@ -302,10 +302,10 @@ static VALUE rkrb5_keytab_get_entry(int argc, VALUE* argv, VALUE self){
  * Examples:
  *
  *   # Using the default keytab
- *   keytab = Krb5Auth::Krb5::Keytab.new
+ *   keytab = Kerberos::Krb5::Keytab.new
  *
  *   # Using an explicit keytab
- *   keytab = Krb5Auth::Krb5::Keytab.new('FILE:/etc/krb5.keytab')
+ *   keytab = Kerberos::Krb5::Keytab.new('FILE:/etc/krb5.keytab')
  */
 static VALUE rkrb5_keytab_initialize(int argc, VALUE* argv, VALUE self){
   RUBY_KRB5_KEYTAB* ptr;
@@ -353,7 +353,7 @@ static VALUE rkrb5_keytab_initialize(int argc, VALUE* argv, VALUE self){
 
 /*
  * call-seq:
- *   Krb5Auth::Krb5::Keytab.foreach(keytab = nil){ |entry|
+ *   Kerberos::Krb5::Keytab.foreach(keytab = nil){ |entry|
  *     puts entry.inspect
  *   }
  *
@@ -469,7 +469,7 @@ static VALUE rkrb5_s_keytab_foreach(int argc, VALUE* argv, VALUE klass){
 }
 
 void Init_keytab(){
-  /* The Krb5Auth::Krb5::Keytab class encapsulates a Kerberos keytab. */
+  /* The Kerberos::Krb5::Keytab class encapsulates a Kerberos keytab. */
   cKrb5Keytab = rb_define_class_under(cKrb5, "Keytab", rb_cObject);
 
   /* The Keytab::Exception is typically raised if any of the Keytab methods fail. */
