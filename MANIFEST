@@ -1,0 +1,16 @@
+CHANGES
+rkerberos.gemspec
+MANIFEST
+Rakefile
+README
+ext/ccache.c
+ext/context.c
+ext/extconf.rb
+ext/kadm5.c
+ext/keytab.c
+ext/keytab_entry.c
+ext/rkerberos.c
+ext/rkerberos.h
+ext/policy.c
+ext/principal.c
+test/test_krb5.rb
