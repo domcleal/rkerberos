@@ -14,6 +14,7 @@ CLEAN.include(
   '**/*.log',               # Ruby extension build log
   '**/Makefile',            # C Makefile
   '**/conftest.dSYM',       # OS X build directory
+  '**/tmp',                 # Temp directory
   "**/*.#{CONFIG['DLEXT']}" # C shared object
 )
 
