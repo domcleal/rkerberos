@@ -35,7 +35,6 @@ static VALUE rkrb5_keytab_allocate(VALUE klass){
 static VALUE rkrb5_keytab_each(VALUE self){
   RUBY_KRB5_KEYTAB* ptr;
   VALUE v_kt_entry;
-  VALUE v_args[0];
   krb5_error_code kerror;
   krb5_kt_cursor cursor;
   krb5_keytab_entry entry;
@@ -55,7 +54,7 @@ static VALUE rkrb5_keytab_each(VALUE self){
   while((kerror = krb5_kt_next_entry(ptr->ctx, ptr->keytab, &entry, &cursor)) == 0){
     krb5_unparse_name(ptr->ctx, entry.principal, &principal);
 
-    v_kt_entry = rb_class_new_instance(0, v_args, cKrb5KtEntry);
+    v_kt_entry = rb_class_new_instance(0, NULL, cKrb5KtEntry);
 
     rb_iv_set(v_kt_entry, "@principal", rb_str_new2(principal));
     rb_iv_set(v_kt_entry, "@timestamp", rb_time_new(entry.timestamp, 0));
@@ -247,7 +246,6 @@ static VALUE rkrb5_keytab_get_entry(int argc, VALUE* argv, VALUE self){
   krb5_keytab_entry entry;
   char* name;
   VALUE v_principal, v_vno, v_enctype, v_entry;
-  VALUE v_args[0];
 
   Data_Get_Struct(self, RUBY_KRB5_KEYTAB, ptr); 
 
@@ -276,7 +274,7 @@ static VALUE rkrb5_keytab_get_entry(int argc, VALUE* argv, VALUE self){
   if(kerror)
     rb_raise(cKrb5Exception, "krb5_kt_get_entry: %s", error_message(kerror));
 
-  v_entry = rb_class_new_instance(0, v_args, cKrb5KtEntry);
+  v_entry = rb_class_new_instance(0, NULL, cKrb5KtEntry);
 
   rb_iv_set(v_entry, "@principal", rb_str_new2(name));
   rb_iv_set(v_entry, "@timestamp", rb_time_new(entry.timestamp, 0));
@@ -365,7 +363,6 @@ static VALUE rkrb5_keytab_initialize(int argc, VALUE* argv, VALUE self){
 static VALUE rkrb5_s_keytab_foreach(int argc, VALUE* argv, VALUE klass){
   VALUE v_kt_entry;
   VALUE v_keytab_name;
-  VALUE v_args[0];
   krb5_error_code kerror;
   krb5_kt_cursor cursor;
   krb5_keytab keytab;
@@ -429,7 +426,7 @@ static VALUE rkrb5_s_keytab_foreach(int argc, VALUE* argv, VALUE klass){
   while((kerror = krb5_kt_next_entry(context, keytab, &entry, &cursor)) == 0){
     krb5_unparse_name(context, entry.principal, &principal);
 
-    v_kt_entry = rb_class_new_instance(0, v_args, cKrb5KtEntry);
+    v_kt_entry = rb_class_new_instance(0, NULL, cKrb5KtEntry);
 
     rb_iv_set(v_kt_entry, "@principal", rb_str_new2(principal));
     rb_iv_set(v_kt_entry, "@timestamp", rb_time_new(entry.timestamp, 0));
