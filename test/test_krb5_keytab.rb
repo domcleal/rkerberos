@@ -21,6 +21,9 @@ class TC_Krb5_Keytab < Test::Unit::TestCase
   def self.startup
     file = Dir.tmpdir + "/test.keytab"
 
+    @@key_file = "FILE:" + file
+    @@home_dir = ENV['HOME'] || ENV['USER_PROFILE']
+
     PTY.spawn('kadmin.local') do |reader, writer, pid|
       reader.gets
       reader.expect(/local:\s+/)
@@ -31,9 +34,6 @@ class TC_Krb5_Keytab < Test::Unit::TestCase
       writer.puts("ktadd -k #{file} testuser2")
       reader.expect(/local:\s+/)
     end
-
-    @@key_file = "FILE:" + file
-    @@home_dir = ENV['HOME'] || ENV['USER_PROFILE']
   end
 
   def setup
