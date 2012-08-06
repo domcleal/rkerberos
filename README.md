@@ -1,10 +1,24 @@
-= Description
+# Description
   The rkerberos library provides a Ruby interface for Kerberos.
 
-= Requirements
+# Requirements
   Kerberos 1.7.0 or later, including admin header and library files.
 
-= Synopsis
+# OSX
+  krb5 must be installed from source before installing the rkerberos gem:
+```
+  wget http://web.mit.edu/kerberos/dist/krb5/1.10/krb5-1.10.2-signed.tar
+  tar -xf krb5-1.10.2-signed.tar
+  tar -xf krb5-1.10.2-signed.tar.gz
+  cd krb5-1.10.2
+  ./configure
+  make
+  make install
+```
+  latest release is here: http://web.mit.edu/kerberos/dist/index.html
+
+# Synopsis
+```ruby
   require 'rkerberos'
 
   # Get the default realm name
@@ -27,25 +41,22 @@
     p kadm5.get_principal('someuser')
     kadm5.set_password('someuser', 'abc123')
   end
+```
 
-= Notes
+# Notes
   The rkerberos library is a repackaging of my custom branch of the krb5_auth
   library. Eventually the gem djberg96-krb5_auth will be removed from the gem
   index.
 
-= MIT vs Heimdal
+# MIT vs Heimdal
   This code was written for the MIT Kerberos library. It has not been tested
   with the Heimdal Kerberos library.
 
-= TODO
+# TODO
   Create a separate class for the replay cache.
   Better credentials cache support.
   Ability to add and delete keytab entries.
 
-= Known Issues
-  OS X users will probably need to install Kerberos manually and specify
-  the dir-config option because it ships with old Kerberos header files,
-  and none of the admin headers or libraries by default.
-
-= Author
+# Author
   Daniel Berger
+
