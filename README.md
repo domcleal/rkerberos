@@ -57,6 +57,7 @@
   Better credentials cache support.
   Ability to add and delete keytab entries.
 
-# Author
+# Authors
   Daniel Berger
+  Dominic Cleal (maintainer)
 
