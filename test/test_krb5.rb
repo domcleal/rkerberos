@@ -129,6 +129,18 @@ class TC_Krb5 < Test::Unit::TestCase
     assert_nothing_raised{ @krb5.get_init_creds_keytab(@user, @keytab, @service) }
   end
 
+  test "get_init_creds_keytab accepts a credential cache" do
+    omit_unless(File.exists?(@keytab), "keytab file not found, skipping")
+    assert_nothing_raised{ @krb5.get_init_creds_keytab(@user, @keytab, @service, @ccache) }
+  end
+
+  test "get_init_creds_keytab stores credentials in the credential cache" do
+    omit_unless(File.exists?(@keytab), "keytab file not found, skipping")
+    ccache = Kerberos::Krb5::CredentialsCache.new
+    assert_nothing_raised{ @krb5.get_init_creds_keytab(@user, @keytab, @service, @ccache) }
+    assert_equal @user, ccache.primary_principal
+  end
+
   test "get_init_creds_keytab requires string arguments" do
     assert_raise(TypeError){ @krb5.get_init_creds_keytab(1) }
     assert_raise(TypeError){ @krb5.get_init_creds_keytab(@user, 1) }

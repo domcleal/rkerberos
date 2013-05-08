@@ -127,7 +127,7 @@ static VALUE rkrb5_set_default_realm(int argc, VALUE* argv, VALUE self){
 }
 
 /* call-seq:
- *   krb5.get_init_creds_keytab(principal = nil, keytab = nil, service = nil)
+ *   krb5.get_init_creds_keytab(principal = nil, keytab = nil, service = nil, ccache = nil)
  *
  * Acquire credentials for +principal+ from +keytab+ using +service+. If
  * no principal is specified, then a principal is derived from the service
@@ -135,16 +135,19 @@ static VALUE rkrb5_set_default_realm(int argc, VALUE* argv, VALUE self){
  *
  * If no keytab file is provided, the default keytab file is used. This is
  * typically /etc/krb5.keytab.
+ *
+ * If +ccache+ is supplied and is a Kerberos::Krb5::CredentialsCache, the
+ * resulting credentials will be stored in the credential cache.
  */
 static VALUE rkrb5_get_init_creds_keytab(int argc, VALUE* argv, VALUE self){
   RUBY_KRB5* ptr;
-  VALUE v_user, v_keytab_name, v_service;
+  VALUE v_user, v_keytab_name, v_service, v_ccache;
   char* user;
   char* service;
   char keytab_name[MAX_KEYTAB_NAME_LEN];
 
   krb5_error_code kerror;
-  krb5_get_init_creds_opt opt;
+  krb5_get_init_creds_opt* opt;
   krb5_creds cred;
 
   Data_Get_Struct(self, RUBY_KRB5, ptr); 
@@ -152,7 +155,11 @@ static VALUE rkrb5_get_init_creds_keytab(int argc, VALUE* argv, VALUE self){
   if(!ptr->ctx)
     rb_raise(cKrb5Exception, "no context has been established");
 
-  rb_scan_args(argc, argv, "03", &v_user, &v_keytab_name, &v_service);
+  kerror = krb5_get_init_creds_opt_alloc(ptr->ctx, &opt);
+  if(kerror)
+    rb_raise(cKrb5Exception, "krb5_get_init_creds_opt_alloc: %s", error_message(kerror));
+
+  rb_scan_args(argc, argv, "04", &v_user, &v_keytab_name, &v_service, &v_ccache);
 
   // We need the service information for later.
   if(NIL_P(v_service)){
@@ -173,8 +180,10 @@ static VALUE rkrb5_get_init_creds_keytab(int argc, VALUE* argv, VALUE self){
       &ptr->princ
     );
 
-    if(kerror)
+    if(kerror) {
+      krb5_get_init_creds_opt_free(ptr->ctx, opt);
       rb_raise(cKrb5Exception, "krb5_sname_to_principal: %s", error_message(kerror));
+    }
   }
   else{
     Check_Type(v_user, T_STRING);
@@ -182,16 +191,20 @@ static VALUE rkrb5_get_init_creds_keytab(int argc, VALUE* argv, VALUE self){
 
     kerror = krb5_parse_name(ptr->ctx, user, &ptr->princ); 
 
-    if(kerror)
+    if(kerror) {
+      krb5_get_init_creds_opt_free(ptr->ctx, opt);
       rb_raise(cKrb5Exception, "krb5_parse_name: %s", error_message(kerror));
+    }
   }
 
   // Use the default keytab if none is specified.
   if(NIL_P(v_keytab_name)){
     kerror = krb5_kt_default_name(ptr->ctx, keytab_name, MAX_KEYTAB_NAME_LEN);
 
-    if(kerror)
+    if(kerror) {
+      krb5_get_init_creds_opt_free(ptr->ctx, opt);
       rb_raise(cKrb5Exception, "krb5_kt_default_name: %s", error_message(kerror));
+    }
   }
   else{
     Check_Type(v_keytab_name, T_STRING);
@@ -204,10 +217,22 @@ static VALUE rkrb5_get_init_creds_keytab(int argc, VALUE* argv, VALUE self){
     &ptr->keytab
   );
 
-  if(kerror)
+  if(kerror) {
+    krb5_get_init_creds_opt_free(ptr->ctx, opt);
     rb_raise(cKrb5Exception, "krb5_kt_resolve: %s", error_message(kerror));
+  }
 
-  krb5_get_init_creds_opt_init(&opt);
+  // Set the credential cache from the supplied Kerberos::Krb5::CredentialsCache
+  if(!NIL_P(v_ccache)){
+    RUBY_KRB5_CCACHE* ccptr;
+    Data_Get_Struct(v_ccache, RUBY_KRB5_CCACHE, ccptr);
+
+    kerror = krb5_get_init_creds_opt_set_out_ccache(ptr->ctx, opt, ccptr->ccache);
+    if(kerror) {
+      krb5_get_init_creds_opt_free(ptr->ctx, opt);
+      rb_raise(cKrb5Exception, "krb5_get_init_creds_opt_set_out_ccache: %s", error_message(kerror));
+    }
+  }
 
   kerror = krb5_get_init_creds_keytab(
     ptr->ctx,
@@ -216,11 +241,15 @@ static VALUE rkrb5_get_init_creds_keytab(int argc, VALUE* argv, VALUE self){
     ptr->keytab,
     0,
     service,
-    &opt
+    opt
   );
 
-  if(kerror)
+  if(kerror) {
+    krb5_get_init_creds_opt_free(ptr->ctx, opt);
     rb_raise(cKrb5Exception, "krb5_get_init_creds_keytab: %s", error_message(kerror));
+  }
+
+  krb5_get_init_creds_opt_free(ptr->ctx, opt);
 
   return self; 
 }
