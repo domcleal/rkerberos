@@ -3,7 +3,6 @@ require 'rake/testtask'
 require 'rake/extensiontask'
 require 'rake/clean'
 require 'rbconfig'
-include Config
 
 Rake::ExtensionTask.new('rkerberos')
 
@@ -15,7 +14,7 @@ CLEAN.include(
   '**/Makefile',            # C Makefile
   '**/conftest.dSYM',       # OS X build directory
   '**/tmp',                 # Temp directory
-  "**/*.#{CONFIG['DLEXT']}" # C shared object
+  "**/*.#{RbConfig::CONFIG['DLEXT']}" # C shared object
 )
 
 desc 'Create a tarball of the source'
