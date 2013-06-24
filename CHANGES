@@ -1,3 +1,9 @@
+= 0.1.2 - 24-Jun-2013
+* Fix kadm5clnt build issue on EL6
+* Remove admin_keytab references for krb5 1.11
+* Add Gemfile
+* Replace deprecated Config with RbConfig (Ruby 2)
+
 = 0.1.1 - 08-May-2013
 * Add credential cache argument to get_init_creds_keytab
 * Fixed invalid VALUE declarations affecting non-gcc compilers
