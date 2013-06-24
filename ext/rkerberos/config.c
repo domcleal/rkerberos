@@ -70,11 +70,6 @@ static VALUE rkadm5_config_initialize(VALUE self){
   else
     rb_iv_set(self, "@kpasswd_port", Qnil);
 
-  if(ptr->config.admin_keytab)
-    rb_iv_set(self, "@admin_keytab", rb_str_new2(ptr->config.admin_keytab));
-  else
-    rb_iv_set(self, "@admin_keytab", Qnil);
-
   if(ptr->config.acl_file)
     rb_iv_set(self, "@acl_file", rb_str_new2(ptr->config.acl_file));
   else
@@ -181,10 +176,6 @@ static VALUE rkadm5_config_inspect(VALUE self){
   rb_str_buf_append(v_str, rb_inspect(rb_iv_get(self, "@acl_file")));
   rb_str_buf_cat2(v_str, " ");
 
-  rb_str_buf_cat2(v_str, "admin_keytab=");
-  rb_str_buf_append(v_str, rb_inspect(rb_iv_get(self, "@admin_keytab")));
-  rb_str_buf_cat2(v_str, " ");
-
   rb_str_buf_cat2(v_str, "admin_server=");
   rb_str_buf_append(v_str, rb_inspect(rb_iv_get(self, "@admin_server")));
   rb_str_buf_cat2(v_str, " ");
@@ -288,7 +279,6 @@ void Init_config(){
   // Accessors
 
   rb_define_attr(cKadm5Config, "acl_file", 1, 0);
-  rb_define_attr(cKadm5Config, "admin_keytab", 1, 0);
   rb_define_attr(cKadm5Config, "admin_server", 1, 0);
   rb_define_attr(cKadm5Config, "dict_file", 1, 0);
   rb_define_attr(cKadm5Config, "enctype", 1, 0);

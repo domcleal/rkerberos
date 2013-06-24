@@ -38,11 +38,6 @@ class TC_Kadm5_Config < Test::Unit::TestCase
     assert_kind_of(String, @config.admin_server)
   end
 
-  test "admin_keytab basic functionality" do
-    assert_respond_to(@config, :admin_keytab)
-    assert_kind_of(String, @config.admin_keytab)
-  end
-
   test "acl_file basic functionality" do
     assert_respond_to(@config, :acl_file)
     assert_kind_of(String, @config.acl_file)
