@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.extensions = ['ext/rkerberos/extconf.rb']
   spec.files      = `git ls-files`.split("\n").reject { |f| f.include?('git') }
   
-  spec.extra_rdoc_files  = ['README.md', 'CHANGES', 'MANIFEST'] + Dir['ext/rkerberos/*.c']
+  spec.extra_rdoc_files  = ['README.md', 'CHANGES', 'MANIFEST', 'LICENSE'] + Dir['ext/rkerberos/*.c']
 
   spec.add_dependency('rake-compiler')
   

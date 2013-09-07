@@ -53,11 +53,13 @@
   with the Heimdal Kerberos library.
 
 # TODO
-  Create a separate class for the replay cache.
-  Better credentials cache support.
-  Ability to add and delete keytab entries.
+* Create a separate class for the replay cache.
+* Better credentials cache support.
+* Ability to add and delete keytab entries.
 
 # Authors
-  Daniel Berger
-  Dominic Cleal (maintainer)
+* Daniel Berger
+* Dominic Cleal (maintainer)
 
+# License
+  rkerberos is distributed under the Artistic 2.0 license.
