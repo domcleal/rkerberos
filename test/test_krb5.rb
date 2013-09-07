@@ -84,14 +84,16 @@ class TC_Krb5 < Test::Unit::TestCase
     assert_respond_to(@krb5, :get_init_creds_password)
   end
 
-  test "get_init_creds_password requires two arguments" do
+  test "get_init_creds_password requires two or three arguments" do
     assert_raise(ArgumentError){ @krb5.get_init_creds_password }
     assert_raise(ArgumentError){ @krb5.get_init_creds_password('test') }
+    assert_raise(ArgumentError){ @krb5.get_init_creds_password('test', 'foo', 'bar', 'baz') }
   end
 
   test "get_init_creds_password requires string arguments" do
     assert_raise(TypeError){ @krb5.get_init_creds_password(1, 2) }
     assert_raise(TypeError){ @krb5.get_init_creds_password('test', 1) }
+    assert_raise(TypeError){ @krb5.get_init_creds_password('test', 'foo', 1) }
   end
 
   test "calling get_init_creds_password after closing the object raises an error" do

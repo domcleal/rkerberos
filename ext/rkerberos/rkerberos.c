@@ -322,25 +322,39 @@ static VALUE rkrb5_change_password(VALUE self, VALUE v_old, VALUE v_new){
 
 /*
  * call-seq:
- *   krb5.get_init_creds_password(user, password)
+ *   krb5.get_init_creds_password(user, password, service = nil)
  *
- * Authenticates the credentials of +user+ using +password+, and has the effect
- * of setting the principal and context internally. This method must typically
- * be called before using other methods.
+ * Authenticates the credentials of +user+ using +password+ against +service+,
+ * and has the effect of setting the principal and context internally. This method
+ * must typically be called before using other methods.
  */
-static VALUE rkrb5_get_init_creds_passwd(VALUE self, VALUE v_user, VALUE v_pass){
-  Check_Type(v_user, T_STRING);
-  Check_Type(v_pass, T_STRING);
-
+static VALUE rkrb5_get_init_creds_passwd(int argc, VALUE* argv, VALUE self){
   RUBY_KRB5* ptr;
-  char* user = StringValuePtr(v_user);
-  char* pass = StringValuePtr(v_pass);
+  VALUE v_user, v_pass, v_service;
+  char* user;
+  char* pass;
+  char* service;
   krb5_error_code kerror;
 
   Data_Get_Struct(self, RUBY_KRB5, ptr); 
 
   if(!ptr->ctx)
     rb_raise(cKrb5Exception, "no context has been established");
+
+  rb_scan_args(argc, argv, "21", &v_user, &v_pass, &v_service);
+
+  Check_Type(v_user, T_STRING);
+  Check_Type(v_pass, T_STRING);
+  user = StringValuePtr(v_user);
+  pass = StringValuePtr(v_pass);
+
+  if(NIL_P(v_service)){
+    service = NULL;
+  }
+  else{
+    Check_Type(v_service, T_STRING);
+    service = StringValuePtr(v_service);
+  }
 
   kerror = krb5_parse_name(ptr->ctx, user, &ptr->princ); 
 
@@ -355,7 +369,7 @@ static VALUE rkrb5_get_init_creds_passwd(VALUE self, VALUE v_user, VALUE v_pass)
     0,
     NULL,
     0,
-    NULL,
+    service,
     NULL
   );
 
@@ -504,7 +518,7 @@ void Init_rkerberos(){
   rb_define_method(cKrb5, "change_password", rkrb5_change_password, 2);
   rb_define_method(cKrb5, "close", rkrb5_close, 0);
   rb_define_method(cKrb5, "get_default_realm", rkrb5_get_default_realm, 0);
-  rb_define_method(cKrb5, "get_init_creds_password", rkrb5_get_init_creds_passwd, 2);
+  rb_define_method(cKrb5, "get_init_creds_password", rkrb5_get_init_creds_passwd, -1);
   rb_define_method(cKrb5, "get_init_creds_keytab", rkrb5_get_init_creds_keytab, -1);
   rb_define_method(cKrb5, "get_default_principal", rkrb5_get_default_principal, 0);
   rb_define_method(cKrb5, "get_permitted_enctypes", rkrb5_get_permitted_enctypes, 0);
