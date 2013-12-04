@@ -9,7 +9,7 @@
 ```
   wget http://web.mit.edu/kerberos/dist/krb5/1.10/krb5-1.10.2-signed.tar
   tar -xf krb5-1.10.2-signed.tar
-  tar -xf krb5-1.10.2-signed.tar.gz
+  tar -zxf krb5-1.10.2.tar.gz
   cd krb5-1.10.2/src
   ./configure
   make
