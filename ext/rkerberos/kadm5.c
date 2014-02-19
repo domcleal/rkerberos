@@ -215,6 +215,62 @@ static VALUE rkadm5_set_password(VALUE self, VALUE v_user, VALUE v_pass){
 }
 
 /*
+Mon Feb 17 23:26:17 MST 2014
+m4ciek / Maciek Nowacki <nowacki@ualberta.ca>
+
+based upon rkadm5_set_password()
+- call with 2nd param as integer, not string
+- we will call kadm5_modify_principal(), instead of _chpass_principal()
+*/
+
+/* call-seq:
+ *   kadm5.set_pwexpiry(user, pwexpiry)
+ *
+ * Set the password expiry date for +user+ (i.e. the principal) to +pwexpiry+.
+ */
+static VALUE rkadm5_set_pwexpiry(VALUE self, VALUE v_user, VALUE v_pwexpiry){
+  Check_Type(v_user, T_STRING);
+  Check_Type(v_pwexpiry, T_FIXNUM);
+
+  RUBY_KADM5* ptr;
+  kadm5_principal_ent_rec ent;
+  char* user = StringValuePtr(v_user);
+  int pwexpiry = NUM2INT(v_pwexpiry);
+  krb5_error_code kerror;
+
+  Data_Get_Struct(self, RUBY_KADM5, ptr);
+
+  if(!ptr->ctx)
+    rb_raise(cKadm5Exception, "no context has been established");
+
+  kerror = krb5_parse_name(ptr->ctx, user, &ptr->princ); 
+
+  if(kerror)
+    rb_raise(cKadm5Exception, "krb5_parse_name: %s", error_message(kerror));
+
+  /*kerror = kadm5_chpass_principal(ptr->handle, ptr->princ, pass);*/
+  memset(&ent, 0, sizeof(ent));
+  kerror = kadm5_get_principal(
+    ptr->handle,
+    ptr->princ,
+    &ent,
+    KADM5_PRINCIPAL_NORMAL_MASK
+  );
+
+  if(kerror)
+    rb_raise(cKadm5Exception, "krb5_get_principal: %s", error_message(kerror));
+
+  /*ptr->princ->pw_expiration=pwexpiry;*/
+  ent.pw_expiration=pwexpiry;
+  kerror = kadm5_modify_principal(ptr->handle, &ent, KADM5_PW_EXPIRATION);
+
+  if(kerror)
+    rb_raise(cKadm5Exception, "kadm5_setpw_expiry: %s", error_message(kerror));
+
+  return self;
+}
+
+/*
  * call-seq:
  *   kadm5.create_principal(name, password)
  *   kadm5.create_principal(principal)
@@ -971,6 +1027,7 @@ void Init_kadm5(){
   rb_define_method(cKadm5, "get_privileges", rkadm5_get_privs, -1);
   rb_define_method(cKadm5, "modify_policy", rkadm5_modify_policy, 1);
   rb_define_method(cKadm5, "set_password", rkadm5_set_password, 2);
+  rb_define_method(cKadm5, "set_pwexpiry", rkadm5_set_pwexpiry, 2);
 
   // Constants
 
