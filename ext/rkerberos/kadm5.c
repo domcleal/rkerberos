@@ -1,4 +1,5 @@
 #include <rkerberos.h>
+#include <kdb.h>
 
 VALUE cKadm5;
 VALUE cKadm5Exception;
@@ -6,6 +7,7 @@ VALUE cKadm5PrincipalNotFoundException;
 
 // Prototype
 static VALUE rkadm5_close(VALUE);
+char** parse_db_args(VALUE v_db_args);
 
 // Free function for the Kerberos::Kadm5 class.
 static void rkadm5_free(RUBY_KADM5* ptr){
@@ -18,6 +20,7 @@ static void rkadm5_free(RUBY_KADM5* ptr){
   if(ptr->ctx)
     krb5_free_context(ptr->ctx);
 
+  free(ptr->db_args);
   free(ptr);
 }
 
@@ -47,7 +50,7 @@ static VALUE rkadm5_allocate(VALUE klass){
  */
 static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
   RUBY_KADM5* ptr;
-  VALUE v_principal, v_password, v_keytab, v_service;
+  VALUE v_principal, v_password, v_keytab, v_service, v_db_args;
   char* user;
   char* pass = NULL;
   char* keytab = NULL;
@@ -87,6 +90,9 @@ static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
     service = StringValuePtr(v_service);
   }
 
+  v_db_args = rb_hash_aref2(v_opts, "db_args");
+  ptr->db_args = parse_db_args(v_db_args);
+
   // Normally I would wait to initialize the context, but we might need it
   // to get the default keytab file name.
   kerror = krb5_init_context(&ptr->ctx);
@@ -113,6 +119,19 @@ static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
   }
 
   if(RTEST(v_password)){
+#ifdef KADM5_API_VERSION_4
+    kerror = kadm5_init_with_password(
+      ptr->ctx,
+      user,
+      pass,
+      service,
+      NULL,
+      KADM5_STRUCT_VERSION,
+      KADM5_API_VERSION_4,
+      ptr->db_args,
+      &ptr->handle
+    );
+#else
 #ifdef KADM5_API_VERSION_3
     kerror = kadm5_init_with_password(
       ptr->ctx,
@@ -122,7 +141,7 @@ static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
       NULL,
       KADM5_STRUCT_VERSION,
       KADM5_API_VERSION_3,
-      NULL,
+      ptr->db_args,
       &ptr->handle
     );
 #else
@@ -133,15 +152,29 @@ static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
       NULL,
       KADM5_STRUCT_VERSION,
       KADM5_API_VERSION_2,
-      NULL,
+      ptr->db_args,
       &ptr->handle
     );
+#endif
 #endif
 
     if(kerror)
       rb_raise(cKadm5Exception, "kadm5_init_with_password: %s", error_message(kerror));
   }
   else if(RTEST(v_keytab)){
+#ifdef KADM5_API_VERSION_4
+    kerror = kadm5_init_with_skey(
+      ptr->ctx,
+      user,
+      keytab,
+      service,
+      NULL,
+      KADM5_STRUCT_VERSION,
+      KADM5_API_VERSION_4,
+      ptr->db_args,
+      &ptr->handle
+  );
+#else
 #ifdef KADM5_API_VERSION_3
     kerror = kadm5_init_with_skey(
       ptr->ctx,
@@ -151,7 +184,7 @@ static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
       NULL,
       KADM5_STRUCT_VERSION,
       KADM5_API_VERSION_3,
-      NULL,
+      ptr->db_args,
       &ptr->handle
     );
 #else
@@ -162,9 +195,10 @@ static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
       NULL,
       KADM5_STRUCT_VERSION,
       KADM5_API_VERSION_2,
-      NULL,
+      ptr->db_args,
       &ptr->handle
     );
+#endif
 #endif
 
     if(kerror)
@@ -216,31 +250,38 @@ static VALUE rkadm5_set_password(VALUE self, VALUE v_user, VALUE v_pass){
 
 /*
  * call-seq:
- *   kadm5.create_principal(name, password)
+ *   kadm5.create_principal(name, password, db_args=nil)
  *   kadm5.create_principal(principal)
  *
  * Creates a new principal +name+ with an initial password of +password+.
  *--
  * TODO: Allow a Principal object to be passed in as an argument.
  */
-static VALUE rkadm5_create_principal(VALUE self, VALUE v_user, VALUE v_pass){
+static VALUE rkadm5_create_principal(int argc, VALUE* argv, VALUE self){
   RUBY_KADM5* ptr;
   char* user;
   char* pass;
+  char** db_args;
   int mask;
   kadm5_principal_ent_rec princ;
   krb5_error_code kerror;
 
   Data_Get_Struct(self, RUBY_KADM5, ptr);
 
+  VALUE v_user, v_pass, v_db_args;
+  rb_scan_args(argc, argv, "21", &v_user, &v_pass, &v_db_args);
   Check_Type(v_user, T_STRING);
   Check_Type(v_pass, T_STRING);
 
   memset(&princ, 0, sizeof(princ));
 
-  mask = KADM5_PRINCIPAL;
+  mask = KADM5_PRINCIPAL | KADM5_TL_DATA;
   user = StringValuePtr(v_user);
   pass = StringValuePtr(v_pass);
+
+  db_args = parse_db_args(v_db_args);
+  add_db_args(&princ, db_args);
+  free(db_args);
 
   if(!ptr->ctx)
     rb_raise(cKadm5Exception, "no context has been established");
@@ -313,6 +354,9 @@ static VALUE rkadm5_close(VALUE self){
   if(ptr->handle)
     kadm5_destroy(ptr->handle);
 
+  free(ptr->db_args);
+
+  ptr->db_args = NULL;
   ptr->ctx    = NULL;
   ptr->princ  = NULL;
   ptr->handle = NULL;
@@ -934,6 +978,75 @@ static VALUE rkadm5_randkey_principal(VALUE self, VALUE v_user){
   return INT2NUM(n_keys);
 }
 
+/**
+ * Parses an array or a single string containing database arguments for kerberos functions.
+ * Returns NULL if v_db_args is nil, otherwise returns a NULL-Terminated array of NULL-Terminated strings
+ */
+char** parse_db_args(VALUE v_db_args){
+  long array_length;
+  char** db_args;
+  switch(TYPE(v_db_args)){
+    case T_STRING:
+      db_args = (char **) malloc(2 * sizeof(char *));
+      db_args[0] = StringValueCStr(v_db_args);
+      db_args[1] = NULL;
+      break;
+    case T_ARRAY:
+      // Multiple arguments
+      array_length = RARRAY_LEN(v_db_args);
+      db_args = (char **) malloc(array_length * sizeof(char *) + 1);
+      for(long i = 0; i < array_length; ++i){
+        VALUE elem = rb_ary_entry(v_db_args, i);
+        Check_Type(elem, T_STRING);
+        db_args[i] = StringValueCStr(elem);
+      }
+      db_args[array_length] = NULL;
+      break;
+    case T_NIL:
+      db_args = NULL;
+      break;
+    default:
+      rb_raise(rb_eTypeError, "Need Single String or Array of Strings for db_args");
+  }
+  return db_args;
+}
+
+/**
+ * Add parsed db-args to principal entry
+ */
+void add_db_args(kadm5_principal_ent_rec* entry, char** db_args){
+  if (db_args){
+    int i;
+    for(i = 0; db_args[i] != NULL; i++){
+      add_tl_data(&entry->n_tl_data, &entry->tl_data, KRB5_TL_DB_ARGS, strlen(db_args[i]) + 1, (krb5_octet*)db_args[i]);
+    }
+  }
+}
+
+/**
+ * Source code taken from kadmin source code at https://github.com/krb5/krb5/blob/master/src/kadmin/cli/kadmin.c
+ */
+void add_tl_data(krb5_int16 *n_tl_datap, krb5_tl_data **tl_datap,
+  krb5_int16 tl_type, krb5_ui_2 len, krb5_octet *contents){
+  krb5_tl_data* tl_data;
+  krb5_octet* copy;
+
+  copy = malloc(len);
+  tl_data = calloc(1, sizeof(*tl_data));
+  memcpy(copy, contents, len);
+
+  tl_data->tl_data_type = tl_type;
+  tl_data->tl_data_length = len;
+  tl_data->tl_data_contents = copy;
+  tl_data->tl_data_next = NULL;
+
+  // Forward to end of tl_data
+  for(; *tl_datap != NULL; tl_datap = &(*tl_datap)->tl_data_next);
+
+  *tl_datap = tl_data;
+  (*n_tl_datap)++;
+}
+
 void Init_kadm5(){
   /* The Kadm5 class encapsulates administrative Kerberos functions. */
   cKadm5 = rb_define_class_under(mKerberos, "Kadm5", rb_cObject);
@@ -958,7 +1071,7 @@ void Init_kadm5(){
 
   rb_define_method(cKadm5, "close", rkadm5_close, 0);
   rb_define_method(cKadm5, "create_policy", rkadm5_create_policy, 1);
-  rb_define_method(cKadm5, "create_principal", rkadm5_create_principal, 2);
+  rb_define_method(cKadm5, "create_principal", rkadm5_create_principal, -1);
   rb_define_method(cKadm5, "delete_policy", rkadm5_delete_policy, 1);
   rb_define_method(cKadm5, "delete_principal", rkadm5_delete_principal, 1);
   rb_define_method(cKadm5, "find_principal", rkadm5_find_principal, 1);

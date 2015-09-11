@@ -15,4 +15,10 @@ else
   raise "kadm5clnt library not found"
 end
 
+if have_header('kdb.h')
+	have_library('libkdb5')
+else
+	raise 'kdb5 library not found'
+end
+
 create_makefile('rkerberos')

@@ -55,6 +55,7 @@ typedef struct {
   krb5_context ctx;
   krb5_principal princ;
   void* handle;
+  char** db_args;
 } RUBY_KADM5;
 
 // Kerberos::Krb5::Keytab::Entry
