@@ -3,6 +3,7 @@ require 'rake/testtask'
 require 'rake/extensiontask'
 require 'rake/clean'
 require 'rbconfig'
+require 'rubygems/package'
 
 Rake::ExtensionTask.new('rkerberos')
 
@@ -36,7 +37,7 @@ namespace :gem do
   desc 'Create the gem'
   task :create => [:clean] do
     spec = eval(IO.read('rkerberos.gemspec'))
-    Gem::Builder.new(spec).build
+    Gem::Package.build(spec)
   end
 
   desc 'Install the gem'
