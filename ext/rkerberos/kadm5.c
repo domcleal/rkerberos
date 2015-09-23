@@ -47,6 +47,11 @@ static VALUE rkadm5_allocate(VALUE klass){
  *
  * You may also pass the :service option to specify the service name. The
  * default is kadmin/admin.
+ *
+ * There is also a :db_args option, which is a single string or array of strings
+ * containing options usually passed to kadmin with the -x switch. For a list of
+ * available options, see the kadmin manpage
+ *
  */
 static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
   RUBY_KADM5* ptr;
@@ -254,6 +259,9 @@ static VALUE rkadm5_set_password(VALUE self, VALUE v_user, VALUE v_pass){
  *   kadm5.create_principal(principal)
  *
  * Creates a new principal +name+ with an initial password of +password+.
+ * +db_args+ is an optional string or array of strings containing options that are usually
+ * passed to add_principal with the -x option. For a list of options, see the kadmin manpage,
+ * in the add_principal section.
  *--
  * TODO: Allow a Principal object to be passed in as an argument.
  */
