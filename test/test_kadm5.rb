@@ -23,6 +23,7 @@ class TC_Kerberos_Kadm5 < Test::Unit::TestCase
     @@server = Kerberos::Kadm5::Config.new.admin_server
     @@info = DBI::DBRC.new('local-kerberos')
     @@host = Socket.gethostname
+    @@ldap_info = DBI::DBRC.new('kerberos-ldap')
 
     # For local testing the FQDN may or may not be available, so let's assume
     # that hosts with the same name are on the same domain.
@@ -42,6 +43,22 @@ class TC_Kerberos_Kadm5 < Test::Unit::TestCase
     @test_princ = "zztop"
     @test_policy = "test_policy"
 
+    if @@ldap_info
+      gem 'net-ldap'
+      require 'net/ldap'
+
+      username = @@ldap_info.user.split('@')
+      @bind_dn = username[0]
+      @ldap_host = username[1]
+      @ldap_password = @@ldap_info.password
+      driver = @@ldap_info.driver.split(':')
+      @subtree_dn = driver[0]
+      @existing_ldap = driver[1]
+      @ldap_test_princ = 'martymcfly'
+
+      @ldap = Net::LDAP.new(host: @ldap_host)
+      @ldap.authenticate(@bind_dn, @ldap_password)
+    end
     @keytab = Kerberos::Krb5::Keytab.new.default_name.split(':').last
 
     unless File.exists?(@keytab)
@@ -247,11 +264,42 @@ class TC_Kerberos_Kadm5 < Test::Unit::TestCase
     assert_nothing_raised{ @kadm.create_principal(@test_princ, "changeme") }
   end
 
-  test "create_principal requires two arguments" do
+  ##
+  # The following two tests are skipped if there is no .dbrc entry for 'kerberos-ldap'
+  # The expected format for the entries is as follows
+  #   username: <bind_dn>@<ldap.hostname>
+  #   password: <ldap_bind_password>
+  #   driver: <krbSubtreeDn>:user (user has to be accessible as uid=user,<krbSubtreeDn>)
+  #     The krbSubtreeDn must be configured under the realm-container as a krbSubtree.
+  # If the entry is present, but the format is not matched (or LDAP is misconfigured), theses tests fail.
+  ##
+  test "create_principal with db_princ_args creates a user under the expected subtree" do
+    omit_unless(@@ldap_info, "No LDAP info specified, skipping db_args tests")
+    assert_nothing_raised { @kadm = Kerberos::Kadm5.new(:principal => @user, :password => @pass) }
+    assert_nothing_raised { @kadm.create_principal(@ldap_test_princ, "changeme", "containerdn=#{@subtree_dn}") }
+    @ldap.open do |ldap|
+      filter = Net::LDAP::Filter.eq(:krbPrincipalName, "#{@ldap_test_princ}@*")
+      base = @subtree_dn
+      assert_not_empty(ldap.search(:base => base, :filter => filter, :return_result => true))
+    end
+  end
+
+  test "create_principal with a dn db_princ_args correctly adds kerberos information to existing user" do
+    omit_unless(@@ldap_info, "No LDAP info specified, skipping db_princ_args tests")
+    assert_nothing_raised { @kadm = Kerberos::Kadm5.new(:principal => @user, :password => @pass) }
+    assert_nothing_raised { @kadm.create_principal(@existing_ldap, "changeme", "dn=uid=#{@existing_ldap},#{@subtree_dn}") }
+    @ldap.open do |ldap|
+      filter = Net::LDAP::Filter.eq(:uid, @existing_ldap) & Net::LDAP::Filter.eq(:objectclass, 'krbPrincipalAux')
+      base = @subtree_dn
+      assert_not_empty(ldap.search(:base => base, :filter => filter, :return_result => true))
+    end
+  end
+
+  test "create_principal requires two or three arguments" do
     assert_nothing_raised{ @kadm = Kerberos::Kadm5.new(:principal => @user, :password => @pass) }
     assert_raise(ArgumentError){ @kadm.create_principal }
     assert_raise(ArgumentError){ @kadm.create_principal(@user) }
-    assert_raise(ArgumentError){ @kadm.create_principal(@user, @pass, @pass) }
+    assert_raise(ArgumentError){ @kadm.create_principal(@user, @pass, @pass, @pass) }
   end
 
   test "attempting to create a principal that already exists raises an error" do
@@ -406,6 +454,10 @@ class TC_Kerberos_Kadm5 < Test::Unit::TestCase
     if @kadm
       @kadm.delete_principal(@test_princ) rescue nil
       @kadm.delete_policy(@test_policy) rescue nil
+      if @@ldap_info
+        @kadm.delete_principal(@ldap_test_princ) rescue nil
+        @kadm.delete_principal(@existing_ldap) rescue nil
+      end
       @kadm.close
     end
 
