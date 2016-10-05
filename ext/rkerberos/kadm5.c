@@ -8,6 +8,9 @@ VALUE cKadm5PrincipalNotFoundException;
 // Prototype
 static VALUE rkadm5_close(VALUE);
 char** parse_db_args(VALUE v_db_args);
+void add_db_args(kadm5_principal_ent_rec*, char**);
+void add_tl_data(krb5_int16 *, krb5_tl_data **,
+  krb5_int16, krb5_ui_2, krb5_octet *);
 
 // Free function for the Kerberos::Kadm5 class.
 static void rkadm5_free(RUBY_KADM5* ptr){
@@ -975,7 +978,8 @@ char** parse_db_args(VALUE v_db_args){
       // Multiple arguments
       array_length = RARRAY_LEN(v_db_args);
       db_args = (char **) malloc(array_length * sizeof(char *) + 1);
-      for(long i = 0; i < array_length; ++i){
+      long i;
+      for(i = 0; i < array_length; ++i){
         VALUE elem = rb_ary_entry(v_db_args, i);
         Check_Type(elem, T_STRING);
         db_args[i] = StringValueCStr(elem);
