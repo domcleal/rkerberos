@@ -21,4 +21,5 @@ else
   raise 'kdb5 library not found'
 end
 
+$CFLAGS << '-std=c99'
 create_makefile('rkerberos')
