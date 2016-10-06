@@ -23,7 +23,11 @@ class TC_Kerberos_Kadm5 < Test::Unit::TestCase
     @@server = Kerberos::Kadm5::Config.new.admin_server
     @@info = DBI::DBRC.new('local-kerberos')
     @@host = Socket.gethostname
-    @@ldap_info = DBI::DBRC.new('kerberos-ldap')
+    begin
+      @@ldap_info = DBI::DBRC.new('kerberos-ldap')
+    rescue DBI::DBRC::DBError
+      @@ldap_info = nil
+    end
 
     # For local testing the FQDN may or may not be available, so let's assume
     # that hosts with the same name are on the same domain.
@@ -54,6 +58,7 @@ class TC_Kerberos_Kadm5 < Test::Unit::TestCase
       driver = @@ldap_info.driver.split(':')
       @subtree_dn = driver[0]
       @existing_ldap = driver[1]
+      @userprefix = driver[2]
       @ldap_test_princ = 'martymcfly'
 
       @ldap = Net::LDAP.new(host: @ldap_host)
@@ -61,7 +66,7 @@ class TC_Kerberos_Kadm5 < Test::Unit::TestCase
     end
     @keytab = Kerberos::Krb5::Keytab.new.default_name.split(':').last
 
-    unless File.exists?(@keytab)
+    unless File.exist?(@keytab)
       @keytab = '/etc/krb5.keytab'
     end
   end
@@ -269,8 +274,17 @@ class TC_Kerberos_Kadm5 < Test::Unit::TestCase
   # The expected format for the entries is as follows
   #   username: <bind_dn>@<ldap.hostname>
   #   password: <ldap_bind_password>
-  #   driver: <krbSubtreeDn>:user (user has to be accessible as uid=user,<krbSubtreeDn>)
-  #     The krbSubtreeDn must be configured under the realm-container as a krbSubtree.
+  #   driver: <krbSubtreeDn>:<user>:<userprefix>
+  # Username must be an LDAP user that has access to read attributes of objects under krbSubtreeDn,
+  # so possibly an administrative user.
+  # Password must be the LDAP bind password for that user
+  # krbSubtreeDn must be configured in kerberos as a subtree that contains kerberos principals
+  # user must be an existing ldap user that does not yet have kerberos information attached to them
+  # user must be accessible in LDAP as <userprefix>=<user>,<krbSubtreeDn>, so if userprefix is uid,
+  # user is foobar, and krbSubtreeDn is ou=People,dc=example,dc=com, the driver variable should read
+  # ou=People,dc=example.com:foobar:uid
+  # The user in the driver must not be the same as the user that is used to connect to kerberos, as it 
+  # is deleted after each test.
   # If the entry is present, but the format is not matched (or LDAP is misconfigured), theses tests fail.
   ##
   test "create_principal with db_princ_args creates a user under the expected subtree" do
@@ -287,7 +301,7 @@ class TC_Kerberos_Kadm5 < Test::Unit::TestCase
   test "create_principal with a dn db_princ_args correctly adds kerberos information to existing user" do
     omit_unless(@@ldap_info, "No LDAP info specified, skipping db_princ_args tests")
     assert_nothing_raised { @kadm = Kerberos::Kadm5.new(:principal => @user, :password => @pass) }
-    assert_nothing_raised { @kadm.create_principal(@existing_ldap, "changeme", "dn=uid=#{@existing_ldap},#{@subtree_dn}") }
+    assert_nothing_raised { @kadm.create_principal(@existing_ldap, "changeme", "dn=#{@userprefix}=#{@existing_ldap},#{@subtree_dn}") }
     @ldap.open do |ldap|
       filter = Net::LDAP::Filter.eq(:uid, @existing_ldap) & Net::LDAP::Filter.eq(:objectclass, 'krbPrincipalAux')
       base = @subtree_dn
