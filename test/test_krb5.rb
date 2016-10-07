@@ -21,7 +21,7 @@ class TC_Krb5 < Test::Unit::TestCase
     end
 
     @@krb5_conf = ENV['KRB5_CONFIG'] || '/etc/krb5.conf'
-    @@realm = IO.read(@@krb5_conf).grep(/default_realm/).first.split('=').last.lstrip.chomp
+    @@realm = IO.read(@@krb5_conf).split("\n").grep(/default_realm/).first.split('=').last.lstrip.chomp
   end
 
   def setup
