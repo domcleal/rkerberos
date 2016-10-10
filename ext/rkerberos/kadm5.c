@@ -91,7 +91,7 @@ static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
   v_service = rb_hash_aref2(v_opts, "service");
 
   if(NIL_P(v_service)){
-    service = "kadmin/admin";
+    service = (char *) "kadmin/admin";
   }
   else{
     Check_Type(v_service, T_STRING);
