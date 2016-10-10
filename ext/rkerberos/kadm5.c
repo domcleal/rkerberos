@@ -877,7 +877,7 @@ static VALUE rkadm5_get_privs(int argc, VALUE* argv, VALUE self){
   VALUE v_return = Qnil;
   VALUE v_strings = Qfalse;
   kadm5_ret_t kerror;
-  int i;
+  unsigned int i;
   long privs;
   int result = 0;
 
