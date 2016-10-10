@@ -550,6 +550,7 @@ static VALUE rkadm5_create_policy(VALUE self, VALUE v_policy){
   v_max_life    = rb_iv_get(v_policy, "@max_life");
   v_history_num = rb_iv_get(v_policy, "@history_num");
 
+  memset(&ent, 0, sizeof(ent));
   ent.policy = StringValueCStr(v_name);
 
   if(RTEST(v_min_classes)){
