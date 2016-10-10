@@ -63,7 +63,7 @@ static VALUE rkadm5_policy_init(VALUE self, VALUE v_options){
     rb_raise(rb_eArgError, "name policy option is mandatory");
   }
   else{
-    ptr->policy.policy = StringValuePtr(v_name);
+    ptr->policy.policy = StringValueCStr(v_name);
     rb_iv_set(self, "@policy", v_name);
   }
 

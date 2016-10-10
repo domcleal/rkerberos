@@ -55,7 +55,7 @@ static VALUE rkrb5_princ_initialize(VALUE self, VALUE v_name){
   else{
     char* name;
     Check_Type(v_name, T_STRING);
-    name = StringValuePtr(v_name);
+    name = StringValueCStr(v_name);
     kerror = krb5_parse_name(ptr->ctx, name, &ptr->principal);
 
     if(kerror)
@@ -112,7 +112,7 @@ static VALUE rkrb5_princ_set_realm(VALUE self, VALUE v_realm){
   Data_Get_Struct(self, RUBY_KRB5_PRINC, ptr); 
 
   Check_Type(v_realm, T_STRING);
-  kdata.data = StringValuePtr(v_realm);
+  kdata.data = StringValueCStr(v_realm);
 
   krb5_princ_set_realm(ptr->ctx, ptr->principal, &kdata);
 
