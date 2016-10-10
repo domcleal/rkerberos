@@ -106,15 +106,12 @@ static VALUE rkrb5_princ_get_realm(VALUE self){
  */
 static VALUE rkrb5_princ_set_realm(VALUE self, VALUE v_realm){
   RUBY_KRB5_PRINC* ptr;
-  krb5_data kdata;
 
-  memset(&kdata, 0, sizeof(kdata));
   Data_Get_Struct(self, RUBY_KRB5_PRINC, ptr); 
 
   Check_Type(v_realm, T_STRING);
-  kdata.data = StringValueCStr(v_realm);
 
-  krb5_princ_set_realm(ptr->ctx, ptr->principal, &kdata);
+  krb5_set_principal_realm(ptr->ctx, ptr->principal, StringValueCStr(v_realm));
 
   return v_realm;
 }
