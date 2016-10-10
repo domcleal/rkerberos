@@ -37,9 +37,9 @@ static VALUE rkrb5_kt_entry_initialize(VALUE self){
  */
 static VALUE rkrb5_kt_entry_inspect(VALUE self){
   RUBY_KRB5_KT_ENTRY* ptr;
-  Data_Get_Struct(self, RUBY_KRB5_KT_ENTRY, ptr);
   VALUE v_str;
 
+  Data_Get_Struct(self, RUBY_KRB5_KT_ENTRY, ptr);
   v_str = rb_str_new2("#<"); 
   rb_str_buf_cat2(v_str, rb_obj_classname(self));
   rb_str_buf_cat2(v_str, " ");

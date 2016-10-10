@@ -270,17 +270,21 @@ static VALUE rkrb5_get_init_creds_keytab(int argc, VALUE* argv, VALUE self){
  * krb5.change_password('XXXXXX', 'YYYYYY')      # Change password for 'foo'
  */
 static VALUE rkrb5_change_password(VALUE self, VALUE v_old, VALUE v_new){
-  Check_Type(v_old, T_STRING);
-  Check_Type(v_new, T_STRING);
 
   RUBY_KRB5* ptr;
   krb5_data result_string;
   krb5_data pw_result_string;
   krb5_error_code kerror;
+  char *old_passwd;
+  char *new_passwd;
 
   int pw_result;
-  char* old_passwd = StringValuePtr(v_old);
-  char* new_passwd = StringValuePtr(v_new);
+
+  Check_Type(v_old, T_STRING);
+  Check_Type(v_new, T_STRING);
+
+  old_passwd = StringValuePtr(v_old);
+  new_passwd = StringValuePtr(v_new);
 
   Data_Get_Struct(self, RUBY_KRB5, ptr); 
 

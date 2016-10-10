@@ -202,15 +202,17 @@ static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
  * Set the password for +user+ (i.e. the principal) to +password+.
  */
 static VALUE rkadm5_set_password(VALUE self, VALUE v_user, VALUE v_pass){
+  RUBY_KADM5* ptr;
+  krb5_error_code kerror;
+  char *user;
+  char *pass;
+
   Check_Type(v_user, T_STRING);
   Check_Type(v_pass, T_STRING);
 
-  RUBY_KADM5* ptr;
-  char* user = StringValuePtr(v_user);
-  char* pass = StringValuePtr(v_pass);
-  krb5_error_code kerror;
-
   Data_Get_Struct(self, RUBY_KADM5, ptr);
+  user = StringValuePtr(v_user);
+  pass = StringValuePtr(v_pass);
 
   if(!ptr->ctx)
     rb_raise(cKadm5Exception, "no context has been established");
@@ -248,10 +250,10 @@ static VALUE rkadm5_create_principal(int argc, VALUE* argv, VALUE self){
   int mask;
   kadm5_principal_ent_rec princ;
   krb5_error_code kerror;
+  VALUE v_user, v_pass, v_db_args;
 
   Data_Get_Struct(self, RUBY_KADM5, ptr);
 
-  VALUE v_user, v_pass, v_db_args;
   rb_scan_args(argc, argv, "21", &v_user, &v_pass, &v_db_args);
   Check_Type(v_user, T_STRING);
   Check_Type(v_pass, T_STRING);
@@ -978,8 +980,7 @@ char** parse_db_args(VALUE v_db_args){
       // Multiple arguments
       array_length = RARRAY_LEN(v_db_args);
       db_args = (char **) malloc(array_length * sizeof(char *) + 1);
-      long i;
-      for(i = 0; i < array_length; ++i){
+      for(long i = 0; i < array_length; ++i){
         VALUE elem = rb_ary_entry(v_db_args, i);
         Check_Type(elem, T_STRING);
         db_args[i] = StringValueCStr(elem);
