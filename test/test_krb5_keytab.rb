@@ -23,16 +23,24 @@ class TC_Krb5_Keytab < Test::Unit::TestCase
 
     @@key_file = "FILE:" + file
     @@home_dir = ENV['HOME'] || ENV['USER_PROFILE']
+    realm = Kerberos::Kadm5::Config.new.realm
 
-    PTY.spawn('kadmin.local') do |reader, writer, pid|
-      reader.gets
-      reader.expect(/local:\s+/)
+    PTY.spawn('ktutil') do |reader, writer, pid|
+      reader.expect(/ktutil:\s+/)
+      writer.puts("add_entry -password -p testuser1@#{realm} -k 1 -e aes128-cts-hmac-sha1-96")
+      reader.expect(/Password for testuser1@#{Regexp.quote(realm)}:\s+/)
+      writer.puts("asdfasdfasdf")
 
-      writer.puts("ktadd -k #{file} testuser1")
-      reader.expect(/local:\s+/)
+      reader.expect(/ktutil:\s+/)
 
-      writer.puts("ktadd -k #{file} testuser2")
-      reader.expect(/local:\s+/)
+      writer.puts("add_entry -password -p testuser2@#{realm} -k 1 -e aes128-cts-hmac-sha1-96")
+      reader.expect(/Password for testuser2@#{Regexp.quote(realm)}:\s+/)
+      writer.puts("asdfasdfasdf")
+
+      reader.expect(/ktutil:\s+/)
+
+      writer.puts("wkt #{file}")
+      reader.expect(/ktutil:\s+/)
     end
   end
 
