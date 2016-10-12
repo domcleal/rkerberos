@@ -111,33 +111,33 @@ class TC_Krb5 < Test::Unit::TestCase
   end
 
   test "get_init_creds_keytab uses a default keytab if no keytab file is specified" do
-    omit_unless(File.exists?(@keytab), "keytab file not found, skipping")
+    omit_unless(File.exist?(@keytab), "keytab file not found, skipping")
     assert_nothing_raised{ @krb5.get_init_creds_keytab(@user) }
   end
 
   test "get_init_creds_keytab accepts a keytab" do
-    omit_unless(File.exists?(@keytab), "keytab file not found, skipping")
+    omit_unless(File.exist?(@keytab), "keytab file not found, skipping")
     assert_nothing_raised{ @krb5.get_init_creds_keytab(@user, @keytab) }
   end
 
   # This test will probably fail (since it defaults to "host") so I've commented it out for now.
   #test "get_init_creds_keytab uses default service principal if no arguments are provided" do
-  #  omit_unless(File.exists?(@keytab), "keytab file not found, skipping")
+  #  omit_unless(File.exist?(@keytab), "keytab file not found, skipping")
   #  assert_nothing_raised{ @krb5.get_init_creds_keytab }
   #end
 
   test "get_init_creds_keytab accepts a service name" do
-    omit_unless(File.exists?(@keytab), "keytab file not found, skipping")
+    omit_unless(File.exist?(@keytab), "keytab file not found, skipping")
     assert_nothing_raised{ @krb5.get_init_creds_keytab(@user, @keytab, @service) }
   end
 
   test "get_init_creds_keytab accepts a credential cache" do
-    omit_unless(File.exists?(@keytab), "keytab file not found, skipping")
+    omit_unless(File.exist?(@keytab), "keytab file not found, skipping")
     assert_nothing_raised{ @krb5.get_init_creds_keytab(@user, @keytab, @service, @ccache) }
   end
 
   test "get_init_creds_keytab stores credentials in the credential cache" do
-    omit_unless(File.exists?(@keytab), "keytab file not found, skipping")
+    omit_unless(File.exist?(@keytab), "keytab file not found, skipping")
     ccache = Kerberos::Krb5::CredentialsCache.new
     assert_nothing_raised{ @krb5.get_init_creds_keytab(@user, @keytab, @service, @ccache) }
     assert_equal @user, ccache.primary_principal

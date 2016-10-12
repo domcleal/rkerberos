@@ -295,7 +295,7 @@ class TC_Krb5_Keytab < Test::Unit::TestCase
   end
 
   def self.shutdown
-    File.delete(@@key_file) if File.exists?(@@key_file)
+    File.delete(@@key_file) if File.exist?(@@key_file)
     @@key_file = nil
     @@home_dir = nil
   end

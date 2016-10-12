@@ -39,13 +39,13 @@ class TC_Krb5_Credentials_Cache < Test::Unit::TestCase
 
   test "calling constructor with no arguments does not create a cache" do
     assert_nothing_raised{ @ccache = Kerberos::Krb5::CredentialsCache.new }
-    assert_false(File.exists?(@cfile))
+    assert_false(File.exist?(@cfile))
     assert_false(cache_found)
   end
 
   test "calling constructor with a principal argument creates a credentials cache" do
     assert_nothing_raised{ @ccache = Kerberos::Krb5::CredentialsCache.new(@princ) }
-    assert_true(File.exists?(@cfile))
+    assert_true(File.exist?(@cfile))
     assert_true(cache_found)
   end
 

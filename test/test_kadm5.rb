@@ -93,7 +93,7 @@ class TC_Kerberos_Kadm5 < Test::Unit::TestCase
 
   test "constructor with valid user and default keytab works as expected" do
     omit_unless(@@host == @@server, "keytab on different host, skipping")
-    omit_unless(File.exists?(@keytab), "default keytab file '#{@keytab}' not found")
+    omit_unless(File.exist?(@keytab), "default keytab file '#{@keytab}' not found")
 
     assert_nothing_raised{
       @kadm = Kerberos::Kadm5.new(:principal => @user, :keytab => true)
@@ -102,7 +102,7 @@ class TC_Kerberos_Kadm5 < Test::Unit::TestCase
 
   test "constructor with valid user and explicit keytab works as expected" do
     omit_unless(@@host == @@server, "keytab on different host, skipping")
-    omit_unless(File.exists?(@keytab), "keytab file '#{@keytab}' not found")
+    omit_unless(File.exist?(@keytab), "keytab file '#{@keytab}' not found")
 
     assert_nothing_raised{
       @kadm = Kerberos::Kadm5.new(:principal => @user, :keytab => @keytab)
