@@ -20,7 +20,7 @@ void Init_keytab_entry();
 void Init_ccache();
 
 // Defined in rkerberos.c
-VALUE rb_hash_aref2(VALUE, char*);
+VALUE rb_hash_aref2(VALUE, const char*);
 
 // Variable declarations
 extern VALUE mKerberos;

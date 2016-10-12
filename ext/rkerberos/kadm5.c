@@ -75,7 +75,7 @@ static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
     rb_raise(rb_eArgError, "principal must be specified");
 
   Check_Type(v_principal, T_STRING);
-  user = StringValuePtr(v_principal);
+  user = StringValueCStr(v_principal);
 
   v_password = rb_hash_aref2(v_opts, "password");
   v_keytab = rb_hash_aref2(v_opts, "keytab");
@@ -85,17 +85,17 @@ static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
 
   if(RTEST(v_password)){
     Check_Type(v_password, T_STRING);
-    pass = StringValuePtr(v_password);
+    pass = StringValueCStr(v_password);
   }
 
   v_service = rb_hash_aref2(v_opts, "service");
 
   if(NIL_P(v_service)){
-    service = "kadmin/admin";
+    service = (char *) "kadmin/admin";
   }
   else{
     Check_Type(v_service, T_STRING);
-    service = StringValuePtr(v_service);
+    service = StringValueCStr(v_service);
   }
 
   v_db_args = rb_hash_aref2(v_opts, "db_args");
@@ -122,7 +122,7 @@ static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
     }
     else{
       Check_Type(v_keytab, T_STRING);
-      keytab = StringValuePtr(v_keytab);
+      keytab = StringValueCStr(v_keytab);
     }
   }
 
@@ -202,15 +202,17 @@ static VALUE rkadm5_initialize(VALUE self, VALUE v_opts){
  * Set the password for +user+ (i.e. the principal) to +password+.
  */
 static VALUE rkadm5_set_password(VALUE self, VALUE v_user, VALUE v_pass){
+  RUBY_KADM5* ptr;
+  krb5_error_code kerror;
+  char *user;
+  char *pass;
+
   Check_Type(v_user, T_STRING);
   Check_Type(v_pass, T_STRING);
 
-  RUBY_KADM5* ptr;
-  char* user = StringValuePtr(v_user);
-  char* pass = StringValuePtr(v_pass);
-  krb5_error_code kerror;
-
   Data_Get_Struct(self, RUBY_KADM5, ptr);
+  user = StringValueCStr(v_user);
+  pass = StringValueCStr(v_pass);
 
   if(!ptr->ctx)
     rb_raise(cKadm5Exception, "no context has been established");
@@ -248,10 +250,10 @@ static VALUE rkadm5_create_principal(int argc, VALUE* argv, VALUE self){
   int mask;
   kadm5_principal_ent_rec princ;
   krb5_error_code kerror;
+  VALUE v_user, v_pass, v_db_args;
 
   Data_Get_Struct(self, RUBY_KADM5, ptr);
 
-  VALUE v_user, v_pass, v_db_args;
   rb_scan_args(argc, argv, "21", &v_user, &v_pass, &v_db_args);
   Check_Type(v_user, T_STRING);
   Check_Type(v_pass, T_STRING);
@@ -259,8 +261,8 @@ static VALUE rkadm5_create_principal(int argc, VALUE* argv, VALUE self){
   memset(&princ, 0, sizeof(princ));
 
   mask = KADM5_PRINCIPAL | KADM5_TL_DATA;
-  user = StringValuePtr(v_user);
-  pass = StringValuePtr(v_pass);
+  user = StringValueCStr(v_user);
+  pass = StringValueCStr(v_pass);
 
   db_args = parse_db_args(v_db_args);
   add_db_args(&princ, db_args);
@@ -296,7 +298,7 @@ static VALUE rkadm5_delete_principal(VALUE self, VALUE v_user){
 
   Data_Get_Struct(self, RUBY_KADM5, ptr);
   Check_Type(v_user, T_STRING);
-  user = StringValuePtr(v_user);
+  user = StringValueCStr(v_user);
 
   if(!ptr->ctx)
     rb_raise(cKadm5Exception, "no context has been established");
@@ -421,7 +423,7 @@ static VALUE rkadm5_find_principal(VALUE self, VALUE v_user){
 
   Data_Get_Struct(self, RUBY_KADM5, ptr);
   Check_Type(v_user, T_STRING);
-  user = StringValuePtr(v_user);
+  user = StringValueCStr(v_user);
 
   memset(&ent, 0, sizeof(ent));
 
@@ -477,7 +479,7 @@ static VALUE rkadm5_get_principal(VALUE self, VALUE v_user){
 
   Data_Get_Struct(self, RUBY_KADM5, ptr);
   Check_Type(v_user, T_STRING);
-  user = StringValuePtr(v_user);
+  user = StringValueCStr(v_user);
 
   memset(&ent, 0, sizeof(ent));
 
@@ -548,7 +550,8 @@ static VALUE rkadm5_create_policy(VALUE self, VALUE v_policy){
   v_max_life    = rb_iv_get(v_policy, "@max_life");
   v_history_num = rb_iv_get(v_policy, "@history_num");
 
-  ent.policy = StringValuePtr(v_name);
+  memset(&ent, 0, sizeof(ent));
+  ent.policy = StringValueCStr(v_name);
 
   if(RTEST(v_min_classes)){
     mask |= KADM5_PW_MIN_CLASSES;
@@ -600,7 +603,7 @@ static VALUE rkadm5_delete_policy(VALUE self, VALUE v_policy){
 
   Data_Get_Struct(self, RUBY_KADM5, ptr);
 
-  policy = StringValuePtr(v_policy);
+  policy = StringValueCStr(v_policy);
 
   kerror = kadm5_delete_policy(ptr->handle, policy);
 
@@ -633,7 +636,7 @@ static VALUE rkadm5_get_policy(VALUE self, VALUE v_name){
   if(!ptr->ctx)
     rb_raise(cKadm5Exception, "no context has been established");
 
-  policy_name = StringValuePtr(v_name);
+  policy_name = StringValueCStr(v_name);
 
   kerror = kadm5_get_policy(ptr->handle, policy_name, &ent); 
 
@@ -685,7 +688,7 @@ static VALUE rkadm5_find_policy(VALUE self, VALUE v_name){
   if(!ptr->ctx)
     rb_raise(cKadm5Exception, "no context has been established");
 
-  policy_name = StringValuePtr(v_name);
+  policy_name = StringValueCStr(v_name);
 
   kerror = kadm5_get_policy(ptr->handle, policy_name, &ent); 
 
@@ -789,7 +792,7 @@ static VALUE rkadm5_get_policies(int argc, VALUE* argv, VALUE self){
   if(NIL_P(v_expr))
     expr = NULL;
   else
-    expr = StringValuePtr(v_expr);
+    expr = StringValueCStr(v_expr);
 
   kerror = kadm5_get_policies(ptr->handle, expr, &pols, &count);
 
@@ -837,7 +840,7 @@ static VALUE rkadm5_get_principals(int argc, VALUE* argv, VALUE self){
   if(NIL_P(v_expr))
     expr = NULL;
   else
-    expr = StringValuePtr(v_expr);
+    expr = StringValueCStr(v_expr);
 
   kerror = kadm5_get_principals(ptr->handle, expr, &princs, &count);
 
@@ -875,7 +878,7 @@ static VALUE rkadm5_get_privs(int argc, VALUE* argv, VALUE self){
   VALUE v_return = Qnil;
   VALUE v_strings = Qfalse;
   kadm5_ret_t kerror;
-  int i;
+  unsigned int i;
   long privs;
   int result = 0;
 
@@ -938,7 +941,7 @@ static VALUE rkadm5_randkey_principal(VALUE self, VALUE v_user){
 
   Data_Get_Struct(self, RUBY_KADM5, ptr);
 
-  user = StringValuePtr(v_user);
+  user = StringValueCStr(v_user);
 
   if(!ptr->ctx)
     rb_raise(cKadm5Exception, "no context has been established");
@@ -978,8 +981,7 @@ char** parse_db_args(VALUE v_db_args){
       // Multiple arguments
       array_length = RARRAY_LEN(v_db_args);
       db_args = (char **) malloc(array_length * sizeof(char *) + 1);
-      long i;
-      for(i = 0; i < array_length; ++i){
+      for(long i = 0; i < array_length; ++i){
         VALUE elem = rb_ary_entry(v_db_args, i);
         Check_Type(elem, T_STRING);
         db_args[i] = StringValueCStr(elem);
