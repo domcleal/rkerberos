@@ -25,7 +25,7 @@ class TC_Kerberos_Kadm5 < Test::Unit::TestCase
     @@host = Socket.gethostname
     begin
       @@ldap_info = DBI::DBRC.new('kerberos-ldap')
-    rescue DBI::DBRC::DBError
+    rescue DBI::DBRC::Error
       @@ldap_info = nil
     end
 
