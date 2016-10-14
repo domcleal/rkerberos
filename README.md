@@ -62,6 +62,7 @@
 # Authors
 * Daniel Berger
 * Dominic Cleal (maintainer)
+* Simon Levermann (maintainer)
 
 # License
   rkerberos is distributed under the Artistic 2.0 license.
