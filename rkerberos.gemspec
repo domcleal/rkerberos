@@ -2,10 +2,10 @@ require 'rubygems'
 
 Gem::Specification.new do |spec|
   spec.name       = 'rkerberos'
-  spec.version    = '0.1.4'
+  spec.version    = '0.1.5'
   spec.authors    = ['Daniel Berger', 'Dominic Cleal', 'Simon Levermann']
   spec.license    = 'Artistic 2.0'
-  spec.email      = ['djberg96@gmail.com', 'dcleal@redhat.com', 'simon-rubygems@slevermann.de']
+  spec.email      = ['djberg96@gmail.com', 'dominic@cleal.org', 'simon-rubygems@slevermann.de']
   spec.homepage   = 'http://github.com/domcleal/rkerberos'
   spec.summary    = 'A Ruby interface for the the Kerberos library'
   spec.test_files = Dir['test/test*']
