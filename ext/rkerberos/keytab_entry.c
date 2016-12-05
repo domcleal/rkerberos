@@ -27,8 +27,6 @@ static VALUE rkrb5_kt_entry_allocate(VALUE klass){
  * methods.
  */
 static VALUE rkrb5_kt_entry_initialize(VALUE self){
-  RUBY_KRB5_KT_ENTRY* ptr;
-  Data_Get_Struct(self, RUBY_KRB5_KT_ENTRY, ptr); 
   return self;
 }
 
@@ -36,8 +34,6 @@ static VALUE rkrb5_kt_entry_initialize(VALUE self){
  * A custom inspect method for nicer output.
  */
 static VALUE rkrb5_kt_entry_inspect(VALUE self){
-  RUBY_KRB5_KT_ENTRY* ptr;
-  Data_Get_Struct(self, RUBY_KRB5_KT_ENTRY, ptr);
   VALUE v_str;
 
   v_str = rb_str_new2("#<"); 

@@ -20,7 +20,7 @@ void Init_keytab_entry();
 void Init_ccache();
 
 // Defined in rkerberos.c
-VALUE rb_hash_aref2(VALUE, char*);
+VALUE rb_hash_aref2(VALUE, const char*);
 
 // Variable declarations
 extern VALUE mKerberos;
@@ -55,6 +55,7 @@ typedef struct {
   krb5_context ctx;
   krb5_principal princ;
   void* handle;
+  char** db_args;
 } RUBY_KADM5;
 
 // Kerberos::Krb5::Keytab::Entry

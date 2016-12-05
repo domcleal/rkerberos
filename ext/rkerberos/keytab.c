@@ -143,7 +143,7 @@ static VALUE rkrb5_keytab_remove_entry(int argc, VALUE* argv, VALUE self){
 
   Check_Type(v_name, T_STRING);
 
-  name = StringValuePtr(v_name);
+  name = StringValueCStr(v_name);
 
   if(!ptr->ctx)
     rb_raise(cKrb5Exception, "no context has been established");
@@ -190,7 +190,7 @@ static VALUE rkrb5_keytab_add_entry(int argc, VALUE* argv, VALUE self){
 
   Check_Type(v_name, T_STRING);
 
-  name = StringValuePtr(v_name);
+  name = StringValueCStr(v_name);
 
   if(!ptr->ctx)
     rb_raise(cKrb5Exception, "no context has been established");
@@ -252,7 +252,7 @@ static VALUE rkrb5_keytab_get_entry(int argc, VALUE* argv, VALUE self){
   rb_scan_args(argc, argv, "12", &v_principal, &v_vno, &v_enctype);
 
   Check_Type(v_principal, T_STRING);
-  name = StringValuePtr(v_principal);
+  name = StringValueCStr(v_principal);
 
   kerror = krb5_parse_name(ptr->ctx, name, &principal);
 
@@ -331,7 +331,7 @@ static VALUE rkrb5_keytab_initialize(int argc, VALUE* argv, VALUE self){
   } 
   else{
     Check_Type(v_keytab_name, T_STRING);
-    strncpy(keytab_name, StringValuePtr(v_keytab_name), MAX_KEYTAB_NAME_LEN);
+    strncpy(keytab_name, StringValueCStr(v_keytab_name), MAX_KEYTAB_NAME_LEN);
     rb_iv_set(self, "@name", v_keytab_name);
   }
 
@@ -391,7 +391,7 @@ static VALUE rkrb5_s_keytab_foreach(int argc, VALUE* argv, VALUE klass){
   } 
   else{
     Check_Type(v_keytab_name, T_STRING);
-    strncpy(keytab_name, StringValuePtr(v_keytab_name), MAX_KEYTAB_NAME_LEN);
+    strncpy(keytab_name, StringValueCStr(v_keytab_name), MAX_KEYTAB_NAME_LEN);
   }
 
   kerror = krb5_kt_resolve(

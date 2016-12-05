@@ -7,7 +7,7 @@ VALUE cKrb5Exception;
 // Function prototypes
 static VALUE rkrb5_close(VALUE);
 
-VALUE rb_hash_aref2(VALUE v_hash, char* key){
+VALUE rb_hash_aref2(VALUE v_hash, const char* key){
   VALUE v_key, v_val;
 
   v_key = rb_str_new2(key);
@@ -115,7 +115,7 @@ static VALUE rkrb5_set_default_realm(int argc, VALUE* argv, VALUE self){
   }
   else{
     Check_Type(v_realm, T_STRING);
-    realm = StringValuePtr(v_realm);
+    realm = StringValueCStr(v_realm);
   }
 
   kerror = krb5_set_default_realm(ptr->ctx, realm);
@@ -167,7 +167,7 @@ static VALUE rkrb5_get_init_creds_keytab(int argc, VALUE* argv, VALUE self){
   }
   else{
     Check_Type(v_service, T_STRING);
-    service = StringValuePtr(v_service);
+    service = StringValueCStr(v_service);
   }
 
   // Convert the name (or service name) to a kerberos principal.
@@ -187,7 +187,7 @@ static VALUE rkrb5_get_init_creds_keytab(int argc, VALUE* argv, VALUE self){
   }
   else{
     Check_Type(v_user, T_STRING);
-    user = StringValuePtr(v_user);
+    user = StringValueCStr(v_user);
 
     kerror = krb5_parse_name(ptr->ctx, user, &ptr->princ); 
 
@@ -208,7 +208,7 @@ static VALUE rkrb5_get_init_creds_keytab(int argc, VALUE* argv, VALUE self){
   }
   else{
     Check_Type(v_keytab_name, T_STRING);
-    strncpy(keytab_name, StringValuePtr(v_keytab_name), MAX_KEYTAB_NAME_LEN);
+    strncpy(keytab_name, StringValueCStr(v_keytab_name), MAX_KEYTAB_NAME_LEN);
   }
 
   kerror = krb5_kt_resolve(
@@ -270,17 +270,21 @@ static VALUE rkrb5_get_init_creds_keytab(int argc, VALUE* argv, VALUE self){
  * krb5.change_password('XXXXXX', 'YYYYYY')      # Change password for 'foo'
  */
 static VALUE rkrb5_change_password(VALUE self, VALUE v_old, VALUE v_new){
-  Check_Type(v_old, T_STRING);
-  Check_Type(v_new, T_STRING);
 
   RUBY_KRB5* ptr;
   krb5_data result_string;
   krb5_data pw_result_string;
   krb5_error_code kerror;
+  char *old_passwd;
+  char *new_passwd;
 
   int pw_result;
-  char* old_passwd = StringValuePtr(v_old);
-  char* new_passwd = StringValuePtr(v_new);
+
+  Check_Type(v_old, T_STRING);
+  Check_Type(v_new, T_STRING);
+
+  old_passwd = StringValueCStr(v_old);
+  new_passwd = StringValueCStr(v_new);
 
   Data_Get_Struct(self, RUBY_KRB5, ptr); 
 
@@ -345,15 +349,15 @@ static VALUE rkrb5_get_init_creds_passwd(int argc, VALUE* argv, VALUE self){
 
   Check_Type(v_user, T_STRING);
   Check_Type(v_pass, T_STRING);
-  user = StringValuePtr(v_user);
-  pass = StringValuePtr(v_pass);
+  user = StringValueCStr(v_user);
+  pass = StringValueCStr(v_pass);
 
   if(NIL_P(v_service)){
     service = NULL;
   }
   else{
     Check_Type(v_service, T_STRING);
-    service = StringValuePtr(v_service);
+    service = StringValueCStr(v_service);
   }
 
   kerror = krb5_parse_name(ptr->ctx, user, &ptr->princ); 

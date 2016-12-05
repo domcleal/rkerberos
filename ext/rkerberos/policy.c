@@ -63,7 +63,7 @@ static VALUE rkadm5_policy_init(VALUE self, VALUE v_options){
     rb_raise(rb_eArgError, "name policy option is mandatory");
   }
   else{
-    ptr->policy.policy = StringValuePtr(v_name);
+    ptr->policy.policy = StringValueCStr(v_name);
     rb_iv_set(self, "@policy", v_name);
   }
 
@@ -117,10 +117,7 @@ static VALUE rkadm5_policy_init(VALUE self, VALUE v_options){
  * A custom inspect method for Policy objects.
  */
 static VALUE rkadm5_policy_inspect(VALUE self){
-  RUBY_KADM5_POLICY* ptr;
   VALUE v_str;
-
-  Data_Get_Struct(self, RUBY_KADM5_POLICY, ptr);
 
   v_str = rb_str_new2("#<");
   rb_str_buf_cat2(v_str, rb_obj_classname(self));

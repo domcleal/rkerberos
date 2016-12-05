@@ -56,7 +56,7 @@ static VALUE rkrb5_ccache_initialize(int argc, VALUE* argv, VALUE self){
 
     kerror = krb5_parse_name(
       ptr->ctx,
-      StringValuePtr(v_principal),
+      StringValueCStr(v_principal),
       &ptr->principal
     );
 
@@ -79,7 +79,7 @@ static VALUE rkrb5_ccache_initialize(int argc, VALUE* argv, VALUE self){
   }
   else{
     Check_Type(v_name, T_STRING);
-    kerror = krb5_cc_resolve(ptr->ctx, StringValuePtr(v_name), &ptr->ccache);
+    kerror = krb5_cc_resolve(ptr->ctx, StringValueCStr(v_name), &ptr->ccache);
 
     if(kerror)
       rb_raise(cKrb5Exception, "krb5_cc_resolve: %s", error_message(kerror));

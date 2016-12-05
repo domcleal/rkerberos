@@ -55,7 +55,7 @@ static VALUE rkrb5_princ_initialize(VALUE self, VALUE v_name){
   else{
     char* name;
     Check_Type(v_name, T_STRING);
-    name = StringValuePtr(v_name);
+    name = StringValueCStr(v_name);
     kerror = krb5_parse_name(ptr->ctx, name, &ptr->principal);
 
     if(kerror)
@@ -106,15 +106,12 @@ static VALUE rkrb5_princ_get_realm(VALUE self){
  */
 static VALUE rkrb5_princ_set_realm(VALUE self, VALUE v_realm){
   RUBY_KRB5_PRINC* ptr;
-  krb5_data kdata;
 
-  memset(&kdata, 0, sizeof(kdata));
   Data_Get_Struct(self, RUBY_KRB5_PRINC, ptr); 
 
   Check_Type(v_realm, T_STRING);
-  kdata.data = StringValuePtr(v_realm);
 
-  krb5_princ_set_realm(ptr->ctx, ptr->principal, &kdata);
+  krb5_set_principal_realm(ptr->ctx, ptr->principal, StringValueCStr(v_realm));
 
   return v_realm;
 }
@@ -146,10 +143,7 @@ static VALUE rkrb5_princ_equal(VALUE self, VALUE v_other){
  * A custom inspect method for the Principal object.
  */
 static VALUE rkrb5_princ_inspect(VALUE self){
-  RUBY_KRB5_PRINC* ptr;
   VALUE v_str;
-
-  Data_Get_Struct(self, RUBY_KRB5_PRINC, ptr); 
 
   v_str = rb_str_new2("#<");
   rb_str_buf_cat2(v_str, rb_obj_classname(self));
