@@ -230,6 +230,51 @@ static VALUE rkadm5_set_password(VALUE self, VALUE v_user, VALUE v_pass){
   return self;
 }
 
+/* call-seq:
+ *   kadm5.set_pwexpire(user, pwexpire)
+ *
+ * Set the password expire date for +user+ (i.e. the principal) to +pwexpire+.
+ */
+static VALUE rkadm5_set_pwexpire(VALUE self, VALUE v_user, VALUE v_pwexpire){
+  Check_Type(v_user, T_STRING);
+  Check_Type(v_pwexpire, T_FIXNUM);
+
+  RUBY_KADM5* ptr;
+  kadm5_principal_ent_rec ent;
+  char* user = StringValuePtr(v_user);
+  int pwexpire = NUM2INT(v_pwexpire);
+  krb5_error_code kerror;
+
+  Data_Get_Struct(self, RUBY_KADM5, ptr);
+
+  if(!ptr->ctx)
+    rb_raise(cKadm5Exception, "no context has been established");
+
+  kerror = krb5_parse_name(ptr->ctx, user, &ptr->princ); 
+
+  if(kerror)
+    rb_raise(cKadm5Exception, "krb5_parse_name: %s", error_message(kerror));
+
+  memset(&ent, 0, sizeof(ent));
+  kerror = kadm5_get_principal(
+    ptr->handle,
+    ptr->princ,
+    &ent,
+    KADM5_PRINCIPAL_NORMAL_MASK
+  );
+
+  if(kerror)
+    rb_raise(cKadm5Exception, "krb5_get_principal: %s", error_message(kerror));
+
+  ent.pw_expiration=pwexpire;
+  kerror = kadm5_modify_principal(ptr->handle, &ent, KADM5_PW_EXPIRATION);
+
+  if(kerror)
+    rb_raise(cKadm5Exception, "kadm5_set_pwexpire: %s", error_message(kerror));
+
+  return self;
+}
+
 /*
  * call-seq:
  *   kadm5.create_principal(name, password, db_args=nil)
@@ -1070,6 +1115,7 @@ void Init_kadm5(){
   rb_define_method(cKadm5, "get_privileges", rkadm5_get_privs, -1);
   rb_define_method(cKadm5, "modify_policy", rkadm5_modify_policy, 1);
   rb_define_method(cKadm5, "set_password", rkadm5_set_password, 2);
+  rb_define_method(cKadm5, "set_pwexpire", rkadm5_set_pwexpire, 2);
 
   // Constants
 
