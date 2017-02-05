@@ -2,8 +2,9 @@ require 'mkmf'
 
 dir_config('rkerberos', '/usr/local')
 
-have_header('krb5.h')
-have_library('krb5')
+unless pkg_config('krb5')
+  raise 'krb5 library not found'
+end
 
 unless pkg_config('com_err')
   puts 'warning: com_err not found, usually a dependency for kadm5clnt'
