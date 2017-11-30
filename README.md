@@ -4,20 +4,19 @@
 # Requirements
   Kerberos 1.7.0 or later, including admin header and library files.
 
-# OS X (10.11)
-  krb5 must be installed from source before installing the rkerberos gem:
-```
-  brew install openssl
-  curl -0 http://web.mit.edu/kerberos/dist/krb5/1.14/krb5-1.14.tar.gz
-  tar -xzf krb5-1.14.tar.gz
-  cd krb5-1.14/src
-  export CPPFLAGS='-I/usr/local/opt/openssl/include'
-  export LDFLAGS='-L/usr/local/opt/openssl/lib'
-  ./configure
-  make
-  make install
-```
-  latest release is here: http://web.mit.edu/kerberos/dist/index.html
+# OS X
+  Install krb5 using homebrew:
+
+  `brew install krb5`
+
+  then install this gem using the homebrew version of krb5:
+
+  `gem install rkerberos -- --with-rkerberos-dir=/usr/local/opt/krb5`
+
+  or if using bundler:
+
+  `bundle config --global build.rkerberos --with-rkerberos-dir=/usr/local/opt/krb5`
+  `bundle install`
 
 # Synopsis
 ```ruby
